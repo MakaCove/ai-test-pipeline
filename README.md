@@ -115,11 +115,13 @@ node scripts/run-api-tests.mjs --module orders
 node scripts/run-api-tests.mjs --ids TC-API-AUTH-001,TC-API-ORDERS-001
 node scripts/run-api-tests.mjs --base-url http://localhost:8080
 
-# UI（Playwright）
+# UI（Playwright，默认 auto-headed：固定缓存 → 系统 Chrome，有头）
 node scripts/run-functional-tests.mjs --limit 20
 node scripts/run-functional-tests.mjs --local-chrome --limit 20
 node scripts/run-functional-tests.mjs --headless --all
 ```
+
+浏览器固定路径配置见 `_shared/ui-test-profile模板.md` → `test-artifacts/ui-test.config.json`。
 
 ### 7.2 npm scripts（等价入口）
 

@@ -4,67 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b1a3b2d-feca-4677-97d3-258407edfff3" name="Changes" comment="docs(guidelines): 更新文档规范和示例内容&#10;&#10;- 修改了范围定义文档的内容结构&#10;- 更新了工作流执行流程的相关描述&#10;- 调整了结果判定规则的具体条款&#10;- 完善了完整示例中的操作指南&#10;- 优化了智能编排相关文档内容&#10;- 重新整理了产物目录布局说明&#10;- 改进了架构与流程的设计描述">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+    <list default="true" id="0b1a3b2d-feca-4677-97d3-258407edfff3" name="Changes" comment="docs(readme): 更新文档说明主流程候选预标注与链路字段&#10;&#10;- 添加主流程候选预标注说明&#10;- 更新目录总览描述&#10;- 添加编码体系表格&#10;- 修改链路字段为trace分组&#10;- 更新常用命令编号&#10;- 调整验收清单内容&#10;- 更新各模块SKILL文档说明&#10;- 修改链路字段从dependsOnCases等改为trace分组&#10;- 添加四维度交叉检查说明&#10;- 添加菜单遍历法说明">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/_shared/ui-test-profile模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/_shared/ui-test-profile模板.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/产物目录布局.md" beforeDir="false" afterPath="$PROJECT_DIR$/_shared/产物目录布局.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/功能用例结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/_shared/功能用例结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/接口报告模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/_shared/接口报告模板.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/接口用例结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/_shared/接口用例结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/界面报告模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/_shared/界面报告模板.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/统一术语.md" beforeDir="false" afterPath="$PROJECT_DIR$/_shared/统一术语.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/选择器策略.md" beforeDir="false" afterPath="$PROJECT_DIR$/_shared/选择器策略.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/项目分析结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/_shared/项目分析结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/01_范围定义.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/02_执行工作流.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/03_用例设计规则.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/04_输出规范.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/05_完整示例.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/06_契约覆盖与验收标准.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/07_接口测试用例设计方法.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/08_端点契约驱动设计.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/09_接口数据链路驱动设计.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/10_智能编排.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/11_安全用例设计.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-execute/01_范围定义.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-execute/02_执行工作流.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-execute/03_结果判定规则.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-execute/04_完整示例.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-execute/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-execute/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/01_范围定义.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/02_执行工作流.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/03_用例设计规则.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/04_输出规范.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/05_完整示例.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/06_功能覆盖与验收标准.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/07_功能测试用例设计方法.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/08_功能清单驱动设计.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/09_功能数据链路驱动设计.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/10_用户操作路径驱动设计.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/11_智能编排.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/functional-test-case-generate/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/01_范围定义.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/02_执行工作流.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/03_输出规范.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/04_完整示例.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/05_多栈扫描指南.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/06_下游衔接.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/compare-results.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/run-api-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run-api-tests.mjs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/run-functional-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run-functional-tests.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/validate-api-cases.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/validate-functional-cases.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/01_范围定义.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/02_执行工作流.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/03_结果判定规则.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/04_完整示例.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/05_浏览器与Profile选择.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ui-test-execute/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/架构与流程.md" beforeDir="false" afterPath="$PROJECT_DIR$/架构与流程.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-test-execute/工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/工作流.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-test-execute/浏览器配置.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/浏览器配置.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,18 +21,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "MakaCove"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;MakaCove&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/MakaCove/ai-test-pipeline.git",
-    "accountId": "1b9d07b2-2168-4b7f-87c5-0d1089bd2f8e"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/MakaCove/ai-test-pipeline.git&quot;,
+    &quot;accountId&quot;: &quot;1b9d07b2-2168-4b7f-87c5-0d1089bd2f8e&quot;
   }
-}]]></component>
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -96,25 +43,25 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="3EO4WUwIbiJ62UHn9LvfJEx7tEx" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "settings.editor.selected.configurable": "vcs.Git"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -138,7 +85,23 @@
       <option name="project" value="LOCAL" />
       <updated>1780036359799</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="docs(test): 删除测试流程相关文档&#10;&#10;- 移除 .idea 目录的 gitignore 配置&#10;- 删除 API 测试用例生成的相关文档&#10;- 删除 API 测试执行的相关文档&#10;- 删除功能测试用例生成的相关文档&#10;- 删除项目分析器的相关文档&#10;- 删除 UI 测试执行的相关文档&#10;- 清理测试流程定义和工作流说明文件">
+      <option name="closed" value="true" />
+      <created>1780039640421</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1780039640421</updated>
+    </task>
+    <task id="LOCAL-00003" summary="docs(readme): 更新文档说明主流程候选预标注与链路字段&#10;&#10;- 添加主流程候选预标注说明&#10;- 更新目录总览描述&#10;- 添加编码体系表格&#10;- 修改链路字段为trace分组&#10;- 更新常用命令编号&#10;- 调整验收清单内容&#10;- 更新各模块SKILL文档说明&#10;- 修改链路字段从dependsOnCases等改为trace分组&#10;- 添加四维度交叉检查说明&#10;- 添加菜单遍历法说明">
+      <option name="closed" value="true" />
+      <created>1780045373337</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1780045373337</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -155,6 +118,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="docs(test): 更新测试文档以反映执行器自动化和导航路径规范&#10;&#10;- 更新 API 测试执行策略，通过 scripts/run-api-tests.mjs 执行所有用例&#10;- 添加 API 和 UI 测试的执行产物定义（报告、JSON 结果、JUnit 报告）&#10;- 调整功能测试生成工作流，新增路由-菜单映射建立步骤（10_用户操作路径驱动设计）&#10;- 更新 UI 测试执行配置，统一使用 scripts/ 目录下的执行脚本而非 test-artifacts/&#10;- 强化菜单驱动导航规范，禁止业务用例使用 navigate 直接访问路由&#10;- 更新用例设计规则，明确会话管理和导航操作步骤（reset_session、ensure_session、click_menu）&#10;- 更新执行示例，体现新的导航路径驱动设计和执行器自动化流程" />
     <MESSAGE value="docs(guidelines): 更新文档规范和示例内容&#10;&#10;- 修改了范围定义文档的内容结构&#10;- 更新了工作流执行流程的相关描述&#10;- 调整了结果判定规则的具体条款&#10;- 完善了完整示例中的操作指南&#10;- 优化了智能编排相关文档内容&#10;- 重新整理了产物目录布局说明&#10;- 改进了架构与流程的设计描述" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(guidelines): 更新文档规范和示例内容&#10;&#10;- 修改了范围定义文档的内容结构&#10;- 更新了工作流执行流程的相关描述&#10;- 调整了结果判定规则的具体条款&#10;- 完善了完整示例中的操作指南&#10;- 优化了智能编排相关文档内容&#10;- 重新整理了产物目录布局说明&#10;- 改进了架构与流程的设计描述" />
+    <MESSAGE value="docs(test): 删除测试流程相关文档&#10;&#10;- 移除 .idea 目录的 gitignore 配置&#10;- 删除 API 测试用例生成的相关文档&#10;- 删除 API 测试执行的相关文档&#10;- 删除功能测试用例生成的相关文档&#10;- 删除项目分析器的相关文档&#10;- 删除 UI 测试执行的相关文档&#10;- 清理测试流程定义和工作流说明文件" />
+    <MESSAGE value="docs(readme): 更新文档说明主流程候选预标注与链路字段&#10;&#10;- 添加主流程候选预标注说明&#10;- 更新目录总览描述&#10;- 添加编码体系表格&#10;- 修改链路字段为trace分组&#10;- 更新常用命令编号&#10;- 调整验收清单内容&#10;- 更新各模块SKILL文档说明&#10;- 修改链路字段从dependsOnCases等改为trace分组&#10;- 添加四维度交叉检查说明&#10;- 添加菜单遍历法说明" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(readme): 更新文档说明主流程候选预标注与链路字段&#10;&#10;- 添加主流程候选预标注说明&#10;- 更新目录总览描述&#10;- 添加编码体系表格&#10;- 修改链路字段为trace分组&#10;- 更新常用命令编号&#10;- 调整验收清单内容&#10;- 更新各模块SKILL文档说明&#10;- 修改链路字段从dependsOnCases等改为trace分组&#10;- 添加四维度交叉检查说明&#10;- 添加菜单遍历法说明" />
   </component>
 </project>

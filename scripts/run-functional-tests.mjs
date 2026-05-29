@@ -16,8 +16,8 @@
  *   --artifacts-dir <dir>   产物根目录（默认 ./test-artifacts）
  *   --base-url <url>        覆盖 baseUrl
  *   --profile <name>        ui-test.config.json 中的 profile 名
- *   --local-chrome          等价 --profile local-chrome-headed
- *   --headless              无头（覆盖 profile 的 headed）
+ *   --local-chrome          强制系统 Chrome（有头，除非同时 --headless）
+ *   --headless              无头（须用户明确指定；默认有头）
  *   --slow-mo <ms>          动作间隔
  *   --limit <n> / --all     范围
  *   --module <name> / --ids <id,...>
@@ -28,6 +28,8 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 
 const DEFAULT_BASE_URL = "http://localhost:5173";
 
@@ -59,8 +61,8 @@ const HELP = `用法:
   --artifacts-dir <dir>  产物根目录（默认 ./test-artifacts）
   --base-url <url>       覆盖 baseUrl
   --profile <name>       ui-test.config.json 中的 profile
-  --local-chrome         等价 --profile local-chrome-headed
-  --headless             无头模式
+  --local-chrome         强制系统 Chrome
+  --headless             无头模式（须明确指定）
   --slow-mo <ms>         动作间隔
   --limit <n> / --all    执行范围
   --module <name> / --ids <id,...>
@@ -95,23 +97,148 @@ function resolveCaseFile(opts) {
   return files[0].full;
 }
 
-// ── profile 解析：CLI > ui-test.config.json > 内置默认 ──
-function resolveProfile(opts, root) {
+function loadUiConfig(root) {
   const cfgPath = path.join(root, "ui-test.config.json");
-  let cfg = null;
-  if (fileExists(cfgPath)) { try { cfg = JSON.parse(fs.readFileSync(cfgPath, "utf8")); } catch { /* ignore */ } }
+  if (!fileExists(cfgPath)) return null;
+  try { return JSON.parse(fs.readFileSync(cfgPath, "utf8")); } catch { return null; }
+}
+
+function scriptRootDir() {
+  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+}
+
+function resolvePlaywrightModulePaths(cfg) {
+  const paths = [];
+  for (const p of cfg?.browserResolve?.playwrightModulePaths || []) {
+    paths.push(path.resolve(p));
+  }
+  let dir = process.cwd();
+  for (let i = 0; i < 8; i++) {
+    paths.push(path.join(dir, "node_modules", "playwright"));
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  paths.push(path.join(scriptRootDir(), "node_modules", "playwright"));
+  return [...new Set(paths)];
+}
+
+async function resolvePlaywrightModule(cfg) {
+  const browsersPath =
+    cfg?.browserResolve?.playwrightBrowsersPath ||
+    process.env.PLAYWRIGHT_BROWSERS_PATH ||
+    path.join(process.env.LOCALAPPDATA || "", "ms-playwright");
+
+  if (fileExists(browsersPath)) {
+    process.env.PLAYWRIGHT_BROWSERS_PATH = browsersPath;
+  }
+
+  for (const pkgDir of resolvePlaywrightModulePaths(cfg)) {
+    const pkgJson = path.join(pkgDir, "package.json");
+    if (!fileExists(pkgJson)) continue;
+    try {
+      const req = createRequire(path.join(pkgDir, "index.js"));
+      const mod = req(".");
+      const version = JSON.parse(fs.readFileSync(pkgJson, "utf8")).version;
+      return { chromium: mod.chromium, version, modulePath: pkgDir, browsersPath };
+    } catch { /* try next */ }
+  }
+
+  try {
+    const mod = await import("playwright");
+    return { chromium: mod.chromium, version: "unknown", modulePath: "playwright", browsersPath };
+  } catch {
+    return null;
+  }
+}
+
+function readChromiumRevision(modulePath) {
+  if (!modulePath || modulePath === "playwright") return null;
+  const browsersJson = path.join(path.dirname(modulePath), "playwright-core", "browsers.json");
+  if (!fileExists(browsersJson)) return null;
+  try {
+    const data = JSON.parse(fs.readFileSync(browsersJson, "utf8"));
+    return data.browsers?.find((b) => b.name === "chromium")?.revision || null;
+  } catch { return null; }
+}
+
+function hasFixedChromium(browsersPath, revision) {
+  if (!revision || !fileExists(browsersPath)) return false;
+  const dir = path.join(browsersPath, `chromium-${revision}`);
+  if (!fileExists(dir)) return false;
+  const markers = [
+    path.join(dir, "INSTALLATION_COMPLETE"),
+    path.join(dir, "chrome-win64", "chrome.exe"),
+    path.join(dir, "chrome-linux", "chrome"),
+    path.join(dir, "chrome-mac", "Chromium.app"),
+  ];
+  return markers.some((p) => fileExists(p));
+}
+
+function findChromeExecutable(cfg) {
+  for (const p of cfg?.browserResolve?.chromeExecutablePaths || []) {
+    const resolved = path.resolve(p);
+    if (fileExists(resolved)) return resolved;
+  }
+  const defaults = [
+    path.join(process.env.ProgramFiles || "", "Google", "Chrome", "Application", "chrome.exe"),
+    path.join(process.env["ProgramFiles(x86)"] || "", "Google", "Chrome", "Application", "chrome.exe"),
+    path.join(process.env.LOCALAPPDATA || "", "Google", "Chrome", "Application", "chrome.exe"),
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/usr/bin/google-chrome",
+    "/usr/bin/google-chrome-stable",
+  ];
+  for (const p of defaults) {
+    if (p && fileExists(p)) return p;
+  }
+  return null;
+}
+
+function resolveBrowserEngine(cfg, pwInfo, headed) {
+  const prefer = cfg?.browserResolve?.preferEngine || ["fixed-chromium", "system-chrome"];
+  const revision = readChromiumRevision(pwInfo?.modulePath);
+  const browsersPath = pwInfo?.browsersPath;
+  const chromeExe = findChromeExecutable(cfg);
+
+  for (const step of prefer) {
+    if (step === "fixed-chromium" && hasFixedChromium(browsersPath, revision)) {
+      return {
+        engine: "playwright-chromium",
+        launchOptions: { headless: !headed },
+        label: `固定缓存 chromium-${revision} (${headed ? "headed" : "headless"})`,
+      };
+    }
+    if (step === "system-chrome" && chromeExe) {
+      return {
+        engine: "local-chrome",
+        launchOptions: { headless: !headed, channel: "chrome" },
+        label: `系统 Chrome (${headed ? "headed" : "headless"}) @ ${chromeExe}`,
+      };
+    }
+  }
+
+  return {
+    engine: "playwright-chromium",
+    launchOptions: { headless: !headed },
+    label: `Playwright Chromium 兜底 (${headed ? "headed" : "headless"})`,
+  };
+}
+
+// ── profile 解析：CLI > ui-test.config.json > 内置默认 ──
+function resolveProfile(opts, cfg) {
   let name = opts.profile;
   if (!name && opts.localChrome) name = opts.headless ? "local-chrome-headless" : "local-chrome-headed";
-  if (!name && opts.headless) name = "playwright-headless";
-  if (!name) name = cfg?.defaultProfile || "playwright-headed";
+  if (!name) name = cfg?.defaultProfile || "auto-headed";
   const builtin = {
+    "auto-headed": { engine: "auto", headed: true, slowMo: 800, launchOptions: { args: ["--start-maximized"] }, contextOptions: { viewport: null } },
+    "auto-headless": { engine: "auto", headed: false, slowMo: 0 },
     "playwright-headed": { engine: "playwright-chromium", headed: true, slowMo: 1000, launchOptions: { args: ["--start-maximized"] }, contextOptions: { viewport: null } },
     "playwright-headless": { engine: "playwright-chromium", headed: false, slowMo: 0 },
     "local-chrome-headed": { engine: "local-chrome", headed: true, slowMo: 800, launchOptions: { args: ["--start-maximized"] }, contextOptions: { viewport: null } },
     "local-chrome-headless": { engine: "local-chrome", headed: false, slowMo: 0 },
   };
-  const profile = cfg?.profiles?.[name] || builtin[name] || builtin["playwright-headed"];
-  if (opts.headless) { profile.headed = false; }
+  const profile = { ...(cfg?.profiles?.[name] || builtin[name] || builtin["auto-headed"]) };
+  if (opts.headless) profile.headed = false;
   if (opts.slowMo != null) profile.slowMo = opts.slowMo;
   return { name, profile };
 }
@@ -373,11 +500,6 @@ function buildMarkdown(meta, results, caseFile, baseUrl, browser, durationMs) {
   return md;
 }
 
-async function loadPlaywright() {
-  try { const mod = await import("playwright"); return mod.chromium; }
-  catch { return null; }
-}
-
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (opts.help) { console.log(HELP); process.exit(0); }
@@ -387,18 +509,31 @@ async function main() {
   catch (e) { console.error(`❌ 读取用例失败：${e.message}`); process.exit(1); }
   if (!Array.isArray(payload) || payload.length < 2) { console.error("❌ 用例结构错误：顶层须为 [meta, ...cases]。"); process.exit(1); }
 
-  const chromium = await loadPlaywright();
-  if (!chromium) {
-    console.error("❌ 未安装 Playwright。请在技能包根目录执行：\n   npm install playwright && npx playwright install chromium\n   （或 npm install 触发 optionalDependencies）");
-    process.exit(2);
-  }
-
   const meta = payload[0];
   const allCases = payload.slice(1);
   const root = path.resolve(process.cwd(), opts.artifactsDir);
+  const cfg = loadUiConfig(root);
+
+  const pwInfo = await resolvePlaywrightModule(cfg);
+  if (!pwInfo) {
+    console.error("❌ 未找到 Playwright npm 包。请执行 npm install playwright，或在 test-artifacts/ui-test.config.json 配置 browserResolve.playwrightModulePaths");
+    process.exit(2);
+  }
+
   const baseUrl = opts.baseUrl || meta.baseUrl || DEFAULT_BASE_URL;
-  const { name: profileName, profile } = resolveProfile(opts, root);
+  const { name: profileName, profile } = resolveProfile(opts, cfg);
   const cases = filterCases(allCases, opts);
+
+  const browserPlan = profile.engine === "auto"
+    ? resolveBrowserEngine(cfg, pwInfo, profile.headed)
+    : {
+      engine: profile.engine,
+      launchOptions: {
+        headless: !profile.headed,
+        ...(profile.engine === "local-chrome" ? { channel: "chrome" } : {}),
+      },
+      label: `${profile.engine} (${profile.headed ? "headed" : "headless"}) profile=${profileName}`,
+    };
 
   const reportsDir = path.join(root, "ui-reports");
   const shotDir = path.join(reportsDir, "screenshots");
@@ -410,12 +545,21 @@ async function main() {
   if (acct?.password) vars.password = acct.password;
   vars.timestamp = String(Date.now());
 
-  const launchOptions = { headless: !profile.headed, slowMo: profile.slowMo || 0, ...(profile.launchOptions || {}) };
-  if (profile.engine === "local-chrome") launchOptions.channel = "chrome";
-  const browserLabel = `${profile.engine} (${profile.headed ? "headed" : "headless"}) profile=${profileName}`;
-  console.log(`\n🚀 UI 测试执行 | ${browserLabel} | baseUrl=${baseUrl} | 选中 ${cases.length}/${allCases.length} 条\n`);
+  const launchOptions = {
+    slowMo: profile.slowMo || 0,
+    ...(profile.launchOptions || {}),
+    ...browserPlan.launchOptions,
+  };
+  const browserLabel = profile.engine === "auto"
+    ? `${browserPlan.label} profile=${profileName}`
+    : browserPlan.label;
 
-  const browser = await chromium.launch(launchOptions);
+  console.log(`\n🚀 UI 测试执行 | baseUrl=${baseUrl} | 选中 ${cases.length}/${allCases.length} 条`);
+  console.log(`📦 Playwright: ${pwInfo.modulePath} (v${pwInfo.version})`);
+  console.log(`📁 浏览器缓存: ${pwInfo.browsersPath}`);
+  console.log(`🌐 引擎: ${browserLabel}\n`);
+
+  const browser = await pwInfo.chromium.launch(launchOptions);
   const context = await browser.newContext(profile.contextOptions || {});
   const page = await context.newPage();
 
