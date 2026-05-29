@@ -1,60 +1,37 @@
 ---
 name: functional-test-case-generate
-description: 基于 project-analysis 与前端真实页面，先建立功能清单再推导功能/UI 测试用例；步骤按菜单路径编排，落盘前执行通用智能编排（变量链、会话置后、拓扑排序）。适用任意前后端分离项目。
+description: 基于 project-analysis 与前端真实页面，识别业务主流程并生成可执行 UI 测试用例；步骤按菜单路径编排。适用任意 Web 项目。
 disable-model-invocation: true
 ---
 
-# 功能测试用例生成器
+# UI 测试用例生成器
 
-**核心原则：用例来自真实功能，步骤按真实用户操作路径编排（菜单 → 模块 → 功能操作），而不是直接 `navigate` 切换路由或为了凑条数。**
+**主流程模式**：读真实页面与菜单 → 识别全部业务主流程 → 生成 WF 用例（数量不设上限）。
 
-输出符合 `_shared/功能用例结构.md` 的 JSON。交付标准是 **功能点覆盖完整、步骤可执行、可追溯、链路可复用、导航路径真实、智能编排可执行**，不是「达到 N 条」。
+## 文档索引
 
-## 前置（优先）
+| 文档 | 说明 |
+|------|------|
+| [主流程识别与设计.md](主流程识别与设计.md) | **必读** — 识别主流程、编写规则 |
+| [菜单导航与步骤.md](菜单导航与步骤.md) | **必读** — click_menu、action、navigate 边界 |
+| [工作流.md](工作流.md) | 执行步骤与落盘 |
+| [智能编排.md](智能编排.md) | **必做** — 依赖排序、executionOrder |
+| [验收与输出.md](验收与输出.md) | 覆盖率验收、coverage 字段 |
+| [完整示例.md](完整示例.md) | JSON 示例 |
+| `_shared/功能用例结构.md` | Canonical Schema |
 
-1. **优先**运行 **project-analyzer**（含 `modules[].routes`）。
-2. 若 `project-analysis` 不可用，回退为：直接扫描路由与页面源码（`router`/`routes` + `views`/`pages` + **布局/侧栏**），并在产物中注明回退来源。
-3. 阅读 **[10_用户操作路径驱动设计.md](10_用户操作路径驱动设计.md)**（**导航路径方法论，必读**）。
-4. 阅读 **[08_功能清单驱动设计.md](08_功能清单驱动设计.md)**（功能清单方法论）。
-5. 阅读 **[09_功能数据链路驱动设计.md](09_功能数据链路驱动设计.md)**（上下游链路规则）。
-6. 阅读 **[11_智能编排.md](11_智能编排.md)**（**落盘前必做，项目无关**）。
-7. 阅读 **[07_功能测试用例设计方法.md](07_功能测试用例设计方法.md)** 与 **[06_功能覆盖与验收标准.md](06_功能覆盖与验收标准.md)**。
+## 快速开始
+
+1. 前置 `project-analyzer`
+2. 建立 `routeMenuMap` → 识别 `mainFlowInventory`
+3. 编写 `TC-FUNC-WF-*` 用例 → [智能编排.md](智能编排.md)
+4. 落盘 `test-artifacts/functional-cases/`
+5. 执行：`node scripts/run-functional-tests.mjs`
 
 ## 做什么 / 不做什么
 
-| ✅ 做 | ❌ 不做 |
-|------|--------|
-| 读每个路由对应页面源码，列出真实控件与业务动作 | 不读代码，按「每路由 4 条模板」循环 |
-| 从布局组件建立 **routeMenuMap**，用 `click_menu` 进入业务页 | 不用 `navigate /<业务路由>` 直接跳路由测业务功能 |
-| 认证用例：`reset_session` → `open_login` → 填表；注册先 `switch_auth_tab` | 不 `click`「注册」代替 Tab 切换；不在已登录页找登录框 |
-| 业务用例：`ensure_session` → `click_menu` → 功能操作 | 不在每条业务用例重复整段登录 + navigate |
-| 每个**已识别功能点**至少 1 条可验证用例 | 不为达标重复「打开页面」类用例 |
-| 从 `saveAs`/`produces` 推断上下游，补全依赖 | 编辑/删除用例硬编码业务数据 |
-| **通用智能编排**：tier + 拓扑排序 + `executionOrder` | 按路由表或编写顺序直接落盘 |
-| 登出/改密 `sessionImpact: invalidate` 置后 | 破坏性认证插在创建用例之前 |
-| 元信息输出 `navigationModel`、`routeMenuMap`、`featureInventory`、`orchestration` | 不以 `totalCases ≥ 3R` 作为验收主标准 |
-
-## 执行顺序（摘要）
-
-1. 读 `project-analysis` + 路由 → 页面组件映射 + **侧栏菜单映射**（`routeMenuMap`）。
-2. **逐页建立功能清单**（见 08）。
-3. 对可串联场景建立**数据链路图**（见 09）。
-4. 对每个功能点用 07 推导场景；步骤按 **10** 的三层路径编写。
-5. 编写 `steps` / `assertions`；标注 `featureRef` / `featureRefs` + `dependsOnCases`。
-6. **执行智能编排**（11）：`executionTier` / `executionOrder` / `sessionImpact`。
-7. 验收：P0 功能 100%、路由 100%、**导航路径合规**、编排验收（11 §12）。
-8. 写入 `test-artifacts/functional-cases/functional-cases-{时间戳}.json`。
-
-## 详细指南
-
-- [01_范围定义.md](01_范围定义.md)
-- [02_执行工作流.md](02_执行工作流.md)
-- [03_用例设计规则.md](03_用例设计规则.md)
-- [04_输出规范.md](04_输出规范.md)
-- [05_完整示例.md](05_完整示例.md)
-- [06_功能覆盖与验收标准.md](06_功能覆盖与验收标准.md)
-- [07_功能测试用例设计方法.md](07_功能测试用例设计方法.md)
-- [08_功能清单驱动设计.md](08_功能清单驱动设计.md)
-- [09_功能数据链路驱动设计.md](09_功能数据链路驱动设计.md)
-- **[10_用户操作路径驱动设计.md](10_用户操作路径驱动设计.md)** ← **必读（全模块导航）**
-- **[11_智能编排.md](11_智能编排.md)** ← **落盘前必做（通用）**
+| ✅ | ❌ |
+|----|-----|
+| 覆盖全部识别出的 UI 主流程 | 每路由固定 N 条模板 |
+| click_menu 真实菜单路径 | navigate 直链业务页 |
+| 1 登录 + WF 链路 | 每条 WF 重复登录 |

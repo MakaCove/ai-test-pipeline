@@ -94,8 +94,8 @@ node scripts/run-functional-tests.mjs --profile local-chrome-headed --slow-mo 10
 
 ## 可选：路由守卫关键词（非中文项目）
 
-机检脚本 `validate-functional-cases.mjs` 识别「路由守卫专项」用例以放行其 `navigate`。
-默认按中英文关键词匹配；非中文项目可在本配置追加 `guardKeywords`，或在用例上加结构化信号
+路由守卫专项用例可在用例上加结构化信号以放行其 `navigate`。
+非中文项目可在本配置追加 `guardKeywords`，或在用例上加结构化信号
 `"isRouteGuard": true` / `tags: ["route-guard"]`（语言无关，推荐）。
 
 ```json

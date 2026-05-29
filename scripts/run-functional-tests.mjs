@@ -3,11 +3,9 @@
  * run-functional-tests.mjs — 功能/UI 用例执行器（Playwright）
  *
  * 读取 functional-cases-*.json，按依赖顺序驱动浏览器执行 steps、判定 UI 断言、
- * 截图，产出三份产物：
+ * 截图，产出 Markdown 报告与截图证据：
  *   - ui-reports/ui-report-{ts}.md      人读报告（_shared/界面报告模板.md）
- *   - ui-reports/ui-results-{ts}.json    机读结果（供 compare-results.mjs / CI）
- *   - ui-reports/ui-junit-{ts}.xml       JUnit 报告
- *   - ui-reports/screenshots/*.png       截图
+ *   - ui-reports/screenshots/*.png       失败/步骤截图
  *
  * 选择器策略（见 _shared/选择器策略.md）：data-testid > role+name > 文案，
  * 命中后将真实 selector 回写到结果，提升可复现性。
@@ -338,21 +336,6 @@ async function runCase(page, testCase, vars, completed, shotDir, ts) {
   return result;
 }
 
-function xmlEscape(s) { return String(s).replace(/[<>&"']/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" }[c])); }
-
-function buildJUnit(results) {
-  const failures = results.filter((r) => r.status === "failed").length;
-  const skipped = results.filter((r) => r.status === "skipped").length;
-  const time = (results.reduce((s, r) => s + r.durationMs, 0) / 1000).toFixed(3);
-  const body = results.map((r) => {
-    let inner = "";
-    if (r.status === "failed") inner = `<failure message="${xmlEscape(r.error || "失败")}"/>`;
-    else if (r.status === "skipped") inner = `<skipped message="${xmlEscape(r.error || "跳过")}"/>`;
-    return `    <testcase classname="${xmlEscape(r.module)}" name="${xmlEscape(r.id + " " + r.title)}" time="${(r.durationMs / 1000).toFixed(3)}">${inner}</testcase>`;
-  }).join("\n");
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<testsuites>\n  <testsuite name="functional-tests" tests="${results.length}" failures="${failures}" skipped="${skipped}" time="${time}">\n${body}\n  </testsuite>\n</testsuites>\n`;
-}
-
 function buildMarkdown(meta, results, caseFile, baseUrl, browser, durationMs) {
   const total = results.length;
   const passed = results.filter((r) => r.status === "passed").length;
@@ -365,10 +348,16 @@ function buildMarkdown(meta, results, caseFile, baseUrl, browser, durationMs) {
   let md = `# UI 测试报告\n\n**生成时间**：${new Date().toISOString()}\n**用例来源**：${caseFile}\n`;
   md += `**项目分析**：${meta?.sourceAnalysis || "N/A"}\n**测试地址**：${baseUrl}\n**浏览器**：${browser}\n\n---\n\n## 概览\n\n`;
   md += `| 指标 | 数值 |\n|------|------|\n| 总用例数 | ${total} |\n| 通过 | ${passed} |\n| 失败 | ${failed} |\n| 跳过 | ${skipped} |\n| 通过率 | ${passRate}% |\n| 执行耗时 | ${(durationMs / 1000).toFixed(1)}s |\n\n---\n\n`;
-  md += `## 功能覆盖（来自用例 meta.coverage）\n\n| 指标 | 数值 |\n|------|------|\n`;
-  md += `| 路由覆盖 | ${cov.routesCovered ?? "?"} / ${cov.routeTotal ?? "?"}（${cov.routeCoveragePercent ?? "?"}%） |\n`;
-  md += `| P0 功能点覆盖 | ${cov.featuresCovered ?? "?"} / ${cov.featureTotal ?? "?"}（${cov.featureCoveragePercent ?? "?"}%） |\n`;
-  md += `| 未覆盖功能点 | ${(cov.uncoveredFeatures || []).join(", ") || "无"} |\n| 孤儿用例数 | ${cov.orphanCases ?? "?"} |\n\n---\n\n`;
+  md += `## 覆盖统计（来自用例 meta.coverage）\n\n| 指标 | 数值 |\n|------|------|\n`;
+  if (cov.mainFlowTotal != null) {
+    md += `| 主流程覆盖 | ${cov.mainFlowsCovered ?? "?"} / ${cov.mainFlowTotal ?? "?"}（${cov.mainFlowCoveragePercent ?? "?"}%） |\n`;
+    md += `| 未覆盖主流程 | ${(cov.uncoveredMainFlows || []).join(", ") || "无"} |\n`;
+  } else {
+    md += `| 路由覆盖 | ${cov.routesCovered ?? "?"} / ${cov.routeTotal ?? "?"}（${cov.routeCoveragePercent ?? "?"}%） |\n`;
+    md += `| P0 功能点覆盖 | ${cov.featuresCovered ?? "?"} / ${cov.featureTotal ?? "?"}（${cov.featureCoveragePercent ?? "?"}%） |\n`;
+    md += `| 未覆盖功能点 | ${(cov.uncoveredFeatures || []).join(", ") || "无"} |\n`;
+  }
+  md += `| 孤儿用例数 | ${cov.orphanCases ?? "?"} |\n\n---\n\n`;
   if (fc.chainScenarioTotal) {
     md += `## 链路覆盖\n\n| 指标 | 数值 |\n|------|------|\n| 链路场景覆盖 | ${fc.chainScenarioCovered} / ${fc.chainScenarioTotal}（${fc.chainScenarioCoveragePercent}%） |\n\n---\n\n`;
   }
@@ -448,15 +437,7 @@ async function main() {
   const failed = results.filter((r) => r.status === "failed").length;
   const skipped = results.filter((r) => r.status === "skipped").length;
   const md = buildMarkdown(meta, results, caseFile, baseUrl, browserLabel, durationMs);
-  const resultsJson = {
-    schema: "ai-test-pipeline/ui-results/v1", generatedAt: new Date().toISOString(),
-    caseFile, baseUrl, profile: profileName, engine: profile.engine, headed: profile.headed, durationMs,
-    summary: { total: results.length, passed, failed, skipped, passRate: results.length ? +((passed / results.length) * 100).toFixed(1) : 0 },
-    coverage: meta.coverage || {}, results,
-  };
   fs.writeFileSync(path.join(reportsDir, `ui-report-${ts}.md`), md, "utf8");
-  fs.writeFileSync(path.join(reportsDir, `ui-results-${ts}.json`), JSON.stringify(resultsJson, null, 2), "utf8");
-  fs.writeFileSync(path.join(reportsDir, `ui-junit-${ts}.xml`), buildJUnit(results), "utf8");
 
   console.log(`\n📊 通过 ${passed} | ❌ 失败 ${failed} | ⏭️ 跳过 ${skipped}`);
   console.log(`📁 报告：${path.join(reportsDir, `ui-report-${ts}.md`)}`);

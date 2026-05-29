@@ -1,21 +1,15 @@
 {
   "name": "ai-test-pipeline",
   "version": "1.0.0",
-  "description": "面向 AI Agent 的测试流水线技能包：项目分析 → 接口/功能用例生成 → 双执行 → 报告。覆盖率 + 链路完整性优先，不以用例条数为 KPI。",
+  "description": "面向 AI Agent 的测试流水线技能包：项目分析 → 接口/功能用例生成 → 执行 → Markdown 报告。",
   "type": "module",
   "private": true,
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "validate:api": "node scripts/validate-api-cases.mjs --strict --enforce-chain",
-    "validate:func": "node scripts/validate-functional-cases.mjs --strict --enforce-chain",
-    "validate": "npm run validate:api && npm run validate:func",
     "test:api": "node scripts/run-api-tests.mjs",
-    "test:ui": "node scripts/run-functional-tests.mjs",
-    "compare": "node scripts/compare-results.mjs",
-    "compare:ci": "node scripts/compare-results.mjs --fail-on-regression",
-    "baseline": "node scripts/compare-results.mjs --update-baseline"
+    "test:ui": "node scripts/run-functional-tests.mjs"
   },
   "optionalDependencies": {
     "playwright": "^1.49.0"

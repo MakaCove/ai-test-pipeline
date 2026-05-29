@@ -3,10 +3,8 @@
  * run-api-tests.mjs — 接口用例确定性执行器（零依赖，Node 内置 fetch）
  *
  * 读取 api-test-case-generate 产出的 api-cases-*.json，按依赖顺序逐条发送 HTTP
- * 请求、判定断言、维护变量链，产出三份产物：
+ * 请求、判定断言、维护变量链，产出 Markdown 报告：
  *   - api-reports/api-report-{ts}.md     人读报告（_shared/接口报告模板.md）
- *   - api-reports/api-results-{ts}.json   机读结果（供 compare-results.mjs / CI）
- *   - api-reports/api-junit-{ts}.xml      JUnit 报告（供 CI 看板）
  *
  * 用法：
  *   node scripts/run-api-tests.mjs [文件路径] [选项]
@@ -215,11 +213,18 @@ async function sendRequest(url, init, timeoutMs, retriesLeft = 1) {
 async function runCase(testCase, vars, opts, completed) {
   const result = {
     id: testCase.id, title: testCase.title || "", module: testCase.module || "",
-    priority: testCase.priority || "", contractRef: testCase.contractRef || "",
+    priority: testCase.priority || "", contractRef: testCase.contractRef || testCase.flowRef || "",
     scenarioRef: testCase.scenarioRef || "", status: "passed",
     durationMs: 0, assertions: [], error: null,
     isChain: Boolean((testCase.dependsOnCases || []).length || (testCase.consumes || []).length || (testCase.produces || []).length || testCase.contractRefs),
   };
+
+  // 0. 用例级 mockData：仅补缺失变量
+  if (testCase.mockData && typeof testCase.mockData === "object") {
+    for (const [k, v] of Object.entries(testCase.mockData)) {
+      if (!(k in vars)) vars[k] = v;
+    }
+  }
 
   // 1. 依赖检查：上游失败 → 跳过
   for (const dep of testCase.dependsOnCases || []) {
@@ -295,30 +300,6 @@ async function runCase(testCase, vars, opts, completed) {
   return result;
 }
 
-function xmlEscape(s) {
-  return String(s).replace(/[<>&"']/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" }[c]));
-}
-
-function buildJUnit(results, suiteName) {
-  const failures = results.filter((r) => r.status === "failed").length;
-  const skipped = results.filter((r) => r.status === "skipped").length;
-  const totalTime = results.reduce((s, r) => s + r.durationMs, 0) / 1000;
-  const cases = results.map((r) => {
-    const time = (r.durationMs / 1000).toFixed(3);
-    let inner = "";
-    if (r.status === "failed") inner = `<failure message="${xmlEscape(r.error || "失败")}"/>`;
-    else if (r.status === "skipped") inner = `<skipped message="${xmlEscape(r.error || "跳过")}"/>`;
-    return `    <testcase classname="${xmlEscape(r.module)}" name="${xmlEscape(r.id + " " + r.title)}" time="${time}">${inner}</testcase>`;
-  }).join("\n");
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="${xmlEscape(suiteName)}" tests="${results.length}" failures="${failures}" skipped="${skipped}" time="${totalTime.toFixed(3)}">
-${cases}
-  </testsuite>
-</testsuites>
-`;
-}
-
 function buildMarkdown(meta, results, caseFile, baseUrl, durationMs) {
   const total = results.length;
   const passed = results.filter((r) => r.status === "passed").length;
@@ -339,10 +320,16 @@ function buildMarkdown(meta, results, caseFile, baseUrl, durationMs) {
   md += `**执行环境**：${baseUrl}\n\n---\n\n## 概览\n\n`;
   md += `| 指标 | 数值 |\n|------|------|\n`;
   md += `| 总用例数 | ${total} |\n| 通过 | ${passed} |\n| 失败 | ${failed} |\n| 跳过 | ${skipped} |\n| 通过率 | ${passRate}% |\n| 执行耗时 | ${(durationMs / 1000).toFixed(1)}s |\n\n---\n\n`;
-  md += `## 契约覆盖（来自用例 meta.coverage）\n\n| 指标 | 数值 |\n|------|------|\n`;
-  md += `| 端点覆盖 | ${cov.endpointsCovered ?? "?"} / ${cov.endpointTotal ?? "?"}（${cov.endpointCoveragePercent ?? "?"}%） |\n`;
-  md += `| P0 契约场景覆盖 | ${cov.contractScenariosCovered ?? "?"} / ${cov.contractScenarioTotal ?? "?"}（${cov.contractScenarioCoveragePercent ?? "?"}%） |\n`;
-  md += `| 未覆盖场景 | ${(cov.uncoveredScenarios || []).join(", ") || "无"} |\n| 孤儿用例数 | ${cov.orphanCases ?? "?"} |\n\n---\n\n`;
+  md += `## 覆盖统计（来自用例 meta.coverage）\n\n| 指标 | 数值 |\n|------|------|\n`;
+  if (cov.mainFlowTotal != null) {
+    md += `| 主流程覆盖 | ${cov.mainFlowsCovered ?? "?"} / ${cov.mainFlowTotal ?? "?"}（${cov.mainFlowCoveragePercent ?? "?"}%） |\n`;
+    md += `| 未覆盖主流程 | ${(cov.uncoveredMainFlows || []).join(", ") || "无"} |\n`;
+  } else {
+    md += `| 端点覆盖 | ${cov.endpointsCovered ?? "?"} / ${cov.endpointTotal ?? "?"}（${cov.endpointCoveragePercent ?? "?"}%） |\n`;
+    md += `| P0 契约场景覆盖 | ${cov.contractScenariosCovered ?? "?"} / ${cov.contractScenarioTotal ?? "?"}（${cov.contractScenarioCoveragePercent ?? "?"}%） |\n`;
+    md += `| 未覆盖场景 | ${(cov.uncoveredScenarios || []).join(", ") || "无"} |\n`;
+  }
+  md += `| 孤儿用例数 | ${cov.orphanCases ?? "?"} |\n\n---\n\n`;
   if (fc.chainScenarioTotal) {
     const cpr = chainResults.length ? ((chainPassed / chainResults.length) * 100).toFixed(1) : "0.0";
     md += `## 链路覆盖\n\n| 指标 | 数值 |\n|------|------|\n`;
@@ -394,8 +381,11 @@ async function main() {
   const baseUrl = opts.baseUrl || meta.baseUrl || DEFAULT_BASE_URL;
   opts.baseUrl = baseUrl;
 
-  // 测试账号注入为系统变量
+  // 测试账号与 mock 数据注入为系统变量
   const vars = {};
+  if (meta.mockData && typeof meta.mockData === "object") {
+    Object.assign(vars, meta.mockData);
+  }
   const acct = meta.testAccount || meta.auth?.testAccount;
   if (acct?.username) vars.username = acct.username;
   if (acct?.password) vars.password = acct.password;
@@ -425,17 +415,7 @@ async function main() {
   const passed = results.filter((r) => r.status === "passed").length;
   const failed = results.filter((r) => r.status === "failed").length;
   const skipped = results.filter((r) => r.status === "skipped").length;
-  const resultsJson = {
-    schema: "ai-test-pipeline/api-results/v1",
-    generatedAt: new Date().toISOString(),
-    caseFile, baseUrl, durationMs,
-    summary: { total: results.length, passed, failed, skipped, passRate: results.length ? +((passed / results.length) * 100).toFixed(1) : 0 },
-    coverage: meta.coverage || {},
-    results,
-  };
   fs.writeFileSync(path.join(reportsDir, `api-report-${ts}.md`), md, "utf8");
-  fs.writeFileSync(path.join(reportsDir, `api-results-${ts}.json`), JSON.stringify(resultsJson, null, 2), "utf8");
-  fs.writeFileSync(path.join(reportsDir, `api-junit-${ts}.xml`), buildJUnit(results, "api-tests"), "utf8");
 
   console.log(`\n📊 通过 ${passed} | ❌ 失败 ${failed} | ⏭️ 跳过 ${skipped}`);
   console.log(`📁 报告：${path.join(reportsDir, `api-report-${ts}.md`)}`);
