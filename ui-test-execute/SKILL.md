@@ -8,6 +8,12 @@ disable-model-invocation: true
 
 # UI 测试执行器
 
+## 核心升级
+
+- 执行前先做机检门禁：`scripts/validate-functional-cases.mjs`
+- 支持链路感知执行：识别 `dependsOnCases`、`produces`、`consumes`、`steps.saveAs/useVar`
+- 报告输出链路统计：`flowChains` 覆盖与链路失败明细
+
 ## 默认行为（用户未说明时）
 
 - **浏览器**：Playwright 自带 Chromium（`ms-playwright/chromium-*`）
@@ -29,6 +35,7 @@ disable-model-invocation: true
 
 ```bash
 cd test-artifacts
+node ../scripts/validate-functional-cases.mjs --strict
 node scripts/run-functional-tests.mjs --limit 20
 node scripts/run-functional-tests.mjs --local-chrome --limit 20
 node scripts/run-functional-tests.mjs --headless --all

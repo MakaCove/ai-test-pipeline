@@ -22,7 +22,8 @@ disable-model-invocation: true
 2. 扫描 API 入口与前端路由（见 `02_执行工作流.md`）
 3. 按模块分组，汇总认证策略
 4. 写入 `test-artifacts/project-analysis-{时间戳}.json`，更新 `test-artifacts/latest`
-5. 在摘要中说明 **scanLimitations** 与下游待办（见 `06_下游衔接.md`）
+5. 输出 `chainHints`（可串联场景线索），帮助下游编排链路
+6. 在摘要中说明 **scanLimitations** 与下游待办（见 `06_下游衔接.md`）
 
 ## 详细指南
 

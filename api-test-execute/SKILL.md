@@ -8,12 +8,19 @@ disable-model-invocation: true
 
 读取 `api-test-case-generate` 生成的 JSON 用例文件，逐条发送 HTTP 请求并验证响应，生成 Markdown 测试报告。
 
+## 核心升级
+
+- 执行前先做机检门禁：`scripts/validate-api-cases.mjs`
+- 支持链路感知执行：识别 `dependsOnCases`、`produces`、`consumes`
+- 报告输出链路统计：`flowChains` 覆盖与链路失败明细
+
 ## 快速开始
 
 1. 定位最新的接口用例文件。
-2. 确认后端服务运行中。
-3. 按顺序执行所有用例。
-4. 生成报告写入 `test-artifacts/api-reports/`。
+2. 执行前机检：`node scripts/validate-api-cases.mjs --strict`
+3. 确认后端服务运行中。
+4. 按依赖顺序执行所有用例。
+5. 生成报告写入 `test-artifacts/api-reports/`。
 
 ## 详细指南
 
