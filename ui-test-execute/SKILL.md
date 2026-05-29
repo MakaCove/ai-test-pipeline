@@ -11,13 +11,17 @@ disable-model-invocation: true
 ## 核心升级
 
 - 执行前先做机检门禁：`scripts/validate-functional-cases.mjs`
+- 确定性执行：`scripts/run-functional-tests.mjs` 负责依赖排序、变量链、断言与截图
 - 支持链路感知执行：识别 `dependsOnCases`、`produces`、`consumes`、`steps.saveAs/useVar`
 - 报告输出链路统计：`flowChains` 覆盖与链路失败明细
+- 三份产物：`ui-report-{ts}.md` + `ui-results-{ts}.json` + `ui-junit-{ts}.xml`
+- 回归对比：`scripts/compare-results.mjs --kind ui`
 
 ## 默认行为（用户未说明时）
 
 - **浏览器**：Playwright 自带 Chromium（`ms-playwright/chromium-*`）
 - **显示**：**有头**（可见窗口）
+- **窗口**：默认最大化（`--start-maximized` + `viewport: null`）
 - **profile**：`playwright-headed`
 
 ## 用户明确指定时
@@ -34,8 +38,8 @@ disable-model-invocation: true
 3. `_shared/ui-test-profile模板.md`
 
 ```bash
-cd test-artifacts
-node ../scripts/validate-functional-cases.mjs --strict
+# 在包含 test-artifacts/ 的目录执行（scripts/ 与 test-artifacts/ 同级），不要 cd test-artifacts
+node scripts/validate-functional-cases.mjs --strict
 node scripts/run-functional-tests.mjs --limit 20
 node scripts/run-functional-tests.mjs --local-chrome --limit 20
 node scripts/run-functional-tests.mjs --headless --all

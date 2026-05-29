@@ -6,14 +6,38 @@ import path from "node:path";
 const SCHEMA = "ai-test-pipeline/api-case/v1";
 const CASE_ID_REGEX = /^TC-API-[A-Z0-9-]+$/;
 const HELP_TEXT = `用法:
-  node scripts/validate-api-cases.mjs [文件路径] [--strict] [--enforce-chain]
+  node scripts/validate-api-cases.mjs [文件路径] [--strict] [--enforce-chain] [--analysis <path>]
   node scripts/validate-api-cases.mjs [--strict] [--enforce-chain] [文件路径]
 
 选项:
   --strict         将 warning 也视为失败（退出码 1）
   --enforce-chain  识别到可串联场景时，若无链路用例则失败
+  --analysis <p>   交叉校验覆盖率分母与 project-analysis（不传则自动探测 meta.sourceAnalysis）
   -h, --help       显示帮助
 `;
+
+// 加载 project-analysis：显式路径 > meta.sourceAnalysis > test-artifacts 下最新
+function loadAnalysis(explicitPath, meta) {
+  const tryRead = (p) => {
+    try {
+      if (!p) return null;
+      const abs = path.isAbsolute(p) ? p : path.resolve(process.cwd(), p);
+      if (!fs.existsSync(abs)) return null;
+      return { data: JSON.parse(fs.readFileSync(abs, "utf8")), path: abs };
+    } catch { return null; }
+  };
+  let hit = tryRead(explicitPath) || tryRead(meta?.sourceAnalysis);
+  if (hit) return hit;
+  try {
+    const root = path.resolve(process.cwd(), "test-artifacts");
+    if (!fs.existsSync(root)) return null;
+    const files = fs.readdirSync(root)
+      .filter((n) => /^project-analysis-.*\.json$/.test(n))
+      .map((n) => ({ p: path.join(root, n), m: fs.statSync(path.join(root, n)).mtimeMs }))
+      .sort((a, b) => b.m - a.m);
+    return files.length ? tryRead(files[0].p) : null;
+  } catch { return null; }
+}
 
 function readJson(filePath) {
   const raw = fs.readFileSync(filePath, "utf8");
@@ -76,7 +100,9 @@ function main() {
 
   const strictMode = args.includes("--strict");
   const enforceChainMode = args.includes("--enforce-chain");
-  const inputArg = args.find((arg) => !arg.startsWith("-"));
+  const analysisIdx = args.indexOf("--analysis");
+  const analysisArg = analysisIdx >= 0 ? args[analysisIdx + 1] : null;
+  const inputArg = args.find((arg, i) => !arg.startsWith("-") && args[i - 1] !== "--analysis");
 
   const issues = [];
   const warnings = [];
@@ -348,6 +374,28 @@ function main() {
     if (!coveredP0ScenarioKeys.has(key)) {
       addIssue("覆盖不足", `P0 契约场景未覆盖: ${key}`);
     }
+  }
+
+  // ── 覆盖率分母锚定：与 project-analysis 交叉校验，防「缩小分母伪造 100%」──
+  const analysis = loadAnalysis(analysisArg, meta);
+  if (analysis) {
+    const discovered = Number(analysis.data?.summary?.totalEndpoints);
+    const declared = Number(coverage?.endpointTotal);
+    if (Number.isFinite(discovered) && discovered > 0 && Number.isFinite(declared)) {
+      if (declared < discovered) {
+        addIssue(
+          "覆盖不足",
+          `endpointTotal(${declared}) 小于 project-analysis 发现的端点数(${discovered})，疑似缩小分母伪造覆盖率。分析文件: ${analysis.path}`,
+        );
+      } else if (declared > discovered) {
+        addWarning(
+          "质量建议",
+          `endpointTotal(${declared}) 大于 project-analysis 端点数(${discovered})，请确认是否人工补充了分析外端点。`,
+        );
+      }
+    }
+  } else if (analysisArg) {
+    addWarning("质量建议", `指定的 --analysis 路径不可读，跳过分母交叉校验: ${analysisArg}`);
   }
 
   if (enforceChainMode) {

@@ -6,14 +6,65 @@ import path from "node:path";
 const SCHEMA = "ai-test-pipeline/functional-case/v1";
 const CASE_ID_REGEX = /^TC-FUNC-[A-Z0-9-]+$/;
 const HELP_TEXT = `用法:
-  node scripts/validate-functional-cases.mjs [文件路径] [--strict] [--enforce-chain]
+  node scripts/validate-functional-cases.mjs [文件路径] [--strict] [--enforce-chain] [--analysis <path>]
   node scripts/validate-functional-cases.mjs [--strict] [--enforce-chain] [文件路径]
 
 选项:
   --strict    将 warning 也视为失败（退出码 1）
   --enforce-chain  识别到可串联场景时，若无链路用例则失败
+  --analysis <p>   交叉校验路由分母与 project-analysis（不传则自动探测 meta.sourceAnalysis）
   -h, --help  显示帮助
 `;
+
+// 加载 project-analysis：显式路径 > meta.sourceAnalysis > test-artifacts 下最新
+function loadAnalysis(explicitPath, meta) {
+  const tryRead = (p) => {
+    try {
+      if (!p) return null;
+      const abs = path.isAbsolute(p) ? p : path.resolve(process.cwd(), p);
+      if (!fs.existsSync(abs)) return null;
+      return { data: JSON.parse(fs.readFileSync(abs, "utf8")), path: abs };
+    } catch { return null; }
+  };
+  let hit = tryRead(explicitPath) || tryRead(meta?.sourceAnalysis);
+  if (hit) return hit;
+  try {
+    const root = path.resolve(process.cwd(), "test-artifacts");
+    if (!fs.existsSync(root)) return null;
+    const files = fs.readdirSync(root)
+      .filter((n) => /^project-analysis-.*\.json$/.test(n))
+      .map((n) => ({ p: path.join(root, n), m: fs.statSync(path.join(root, n)).mtimeMs }))
+      .sort((a, b) => b.m - a.m);
+    return files.length ? tryRead(files[0].p) : null;
+  } catch { return null; }
+}
+
+// 路由守卫识别关键词：优先读 ui-test.config.json.guardKeywords，回退中文默认。
+// 同时支持结构化信号（用例 isRouteGuard:true 或 tags 含 route-guard），适配非中文项目。
+const DEFAULT_GUARD_KEYWORDS = ["守卫", "重定向", "路由守卫", "守卫专项", "guard", "redirect"];
+
+function loadGuardKeywords() {
+  try {
+    const cfgPath = path.resolve(process.cwd(), "test-artifacts", "ui-test.config.json");
+    if (fs.existsSync(cfgPath)) {
+      const cfg = JSON.parse(fs.readFileSync(cfgPath, "utf8"));
+      if (Array.isArray(cfg.guardKeywords) && cfg.guardKeywords.length) {
+        return cfg.guardKeywords.filter((k) => typeof k === "string" && k.trim());
+      }
+    }
+  } catch { /* ignore */ }
+  return DEFAULT_GUARD_KEYWORDS;
+}
+
+function isGuardCaseOf(testCase, keywords) {
+  if (testCase?.module !== "auth") return false;
+  // 结构化信号（语言无关，推荐）
+  if (testCase?.isRouteGuard === true) return true;
+  if (Array.isArray(testCase?.tags) && testCase.tags.some((t) => /route-?guard/i.test(String(t)))) return true;
+  // 关键词回退
+  const hay = `${testCase?.title || ""}\n${testCase?.description || ""}`;
+  return keywords.some((k) => hay.includes(k));
+}
 
 const PRODUCER_TYPES = new Set(["form", "dialog", "batch", "async", "auth"]);
 const CONSUMER_TYPES = new Set(["table-action", "state-display", "filter", "pagination", "readonly", "navigation", "form", "dialog", "auth"]);
@@ -80,7 +131,10 @@ function main() {
 
   const strictMode = args.includes("--strict");
   const enforceChainMode = args.includes("--enforce-chain");
-  const inputArg = args.find((arg) => !arg.startsWith("-"));
+  const analysisIdx = args.indexOf("--analysis");
+  const analysisArg = analysisIdx >= 0 ? args[analysisIdx + 1] : null;
+  const inputArg = args.find((arg, i) => !arg.startsWith("-") && args[i - 1] !== "--analysis");
+  const guardKeywords = loadGuardKeywords();
   const issues = [];
   const warnings = [];
 
@@ -116,6 +170,26 @@ function main() {
 
   if (meta?.schema !== SCHEMA) {
     addIssue("结构错误", `schema 必须为 "${SCHEMA}"。`);
+  }
+
+  if (meta?.navigationModel && meta.navigationModel !== "menu-driven") {
+    addIssue("导航路径", `navigationModel 必须为 "menu-driven"，当前为 "${meta.navigationModel}"。`);
+  } else if (!meta?.navigationModel) {
+    addWarning("导航路径", '建议填写 meta.navigationModel = "menu-driven"。');
+  }
+
+  const routeMenuMap = Array.isArray(coverage?.routeMenuMap) ? coverage.routeMenuMap : [];
+  const menuLabelSet = new Set(
+    routeMenuMap.map((item) => item?.menuLabel).filter((label) => typeof label === "string" && label.trim() !== ""),
+  );
+  const menuRouteSet = new Set(
+    routeMenuMap
+      .filter((item) => item?.menuLabel && item?.route)
+      .map((item) => String(item.route).trim()),
+  );
+
+  if (meta?.navigationModel === "menu-driven" && routeMenuMap.length === 0) {
+    addIssue("导航路径", "menu-driven 模式下 coverage.routeMenuMap 必须为非空数组。");
   }
 
   const requiredCoverageKeys = [
@@ -293,6 +367,9 @@ function main() {
     }
 
     const stepSavedVars = new Set();
+    const isGuardCase = isGuardCaseOf(testCase, guardKeywords);
+    const hasAuthTabSwitch = steps.some((s) => s?.action === "switch_auth_tab");
+
     for (const step of steps) {
       const saveAs = typeof step?.saveAs === "string" ? step.saveAs.trim() : "";
       const useVar = typeof step?.useVar === "string" ? step.useVar.trim() : "";
@@ -318,15 +395,50 @@ function main() {
         addIssue("硬编码风险", `检测到默认账号口令硬编码: ${value}`, caseId);
       }
 
-      if (/用户名/.test(target) && !/\{\{username\}\}/.test(value)) {
-        addIssue("硬编码风险", "登录用户名输入建议使用 {{username}} 占位。", caseId);
+    }
+
+    // --- 导航路径校验（menu-driven）---
+    if (meta?.navigationModel === "menu-driven") {
+      const hasNavigateToMenuRoute = steps.some((step) => {
+        if (step?.action !== "navigate") return false;
+        const target = String(step?.target ?? "").trim();
+        return menuRouteSet.has(target);
+      });
+
+      if (hasNavigateToMenuRoute && testCase?.module !== "auth") {
+        addIssue(
+          "导航路径",
+          `业务模块用例不得 navigate 进入菜单可达路由，应使用 click_menu（${caseId}）。`,
+          caseId,
+        );
       }
-      if (/密码/.test(target) && !/\{\{password\}\}/.test(value)) {
-        addIssue("硬编码风险", "登录密码输入建议使用 {{password}} 占位。", caseId);
+      if (hasNavigateToMenuRoute && testCase?.module === "auth" && !isGuardCase) {
+        addIssue(
+          "导航路径",
+          `auth 模块非守卫专项不得 navigate 进入菜单路由，登录页请用 open_login（${caseId}）。`,
+          caseId,
+        );
       }
 
-      if (/项目名称|名称/.test(target) && !/\{\{timestamp\}\}/.test(value)) {
-        addWarning("质量建议", "创建型数据建议追加 {{timestamp}} 保证可重复执行。", caseId);
+      for (const step of steps) {
+        if (step?.action === "click_menu") {
+          const label = String(step?.target ?? "").trim();
+          if (label && !menuLabelSet.has(label)) {
+            addIssue("导航路径", `click_menu target「${label}」不在 routeMenuMap.menuLabel 中。`, caseId);
+          }
+        }
+      }
+
+      if (hasAuthTabSwitch && !steps.some((s) => s?.action === "open_login")) {
+        addWarning("导航路径", "存在 switch_auth_tab 时，建议先显式 open_login。", caseId);
+      }
+
+      const isBusinessCase = testCase?.module && testCase.module !== "auth";
+      const needsMenuEntry = steps.some((s) =>
+        ["click", "fill", "select"].includes(s?.action),
+      );
+      if (isBusinessCase && needsMenuEntry && !steps.some((s) => s?.action === "click_menu")) {
+        addWarning("导航路径", "业务模块功能用例建议包含 click_menu 进入目标页面。", caseId);
       }
     }
   }
@@ -415,6 +527,28 @@ function main() {
     }
   }
 
+  // ── 覆盖率分母锚定：路由分母与 project-analysis 交叉校验 ──
+  const analysis = loadAnalysis(analysisArg, meta);
+  if (analysis) {
+    const discovered = Number(analysis.data?.summary?.totalRoutes);
+    const declared = Number(coverage?.routeTotal);
+    if (Number.isFinite(discovered) && discovered > 0 && Number.isFinite(declared)) {
+      if (declared < discovered) {
+        addIssue(
+          "覆盖不足",
+          `routeTotal(${declared}) 小于 project-analysis 发现的路由数(${discovered})，疑似缩小分母伪造覆盖率。分析文件: ${analysis.path}`,
+        );
+      } else if (declared > discovered) {
+        addWarning(
+          "质量建议",
+          `routeTotal(${declared}) 大于 project-analysis 路由数(${discovered})，请确认是否人工补充了分析外路由。`,
+        );
+      }
+    }
+  } else if (analysisArg) {
+    addWarning("质量建议", `指定的 --analysis 路径不可读，跳过分母交叉校验: ${analysisArg}`);
+  }
+
   function finish() {
     console.log(`\n📄 文件: ${filePath}`);
     const modeParts = [];
@@ -436,7 +570,7 @@ function main() {
       console.log("");
     };
 
-    const categories = ["结构错误", "覆盖不足", "追溯缺失", "链路缺失", "质量不达标", "硬编码风险"];
+    const categories = ["结构错误", "覆盖不足", "追溯缺失", "链路缺失", "导航路径", "质量不达标", "硬编码风险"];
     for (const category of categories) {
       printGroup(category, issues.filter((it) => it.category === category));
     }

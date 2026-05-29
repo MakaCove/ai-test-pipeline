@@ -10,8 +10,9 @@
 |------|----------|----------------|
 | 浏览器 | **Playwright 自带 Chromium** | 说「本地 Chrome / 系统 Chrome」→ 本机 Google Chrome |
 | 显示模式 | **有头**（弹出窗口，可见操作） | 说「无头 / headless / CI」→ 无头 |
+| 窗口尺寸（有头） | **启动即最大化** | 仅在用户明确要求固定尺寸时覆盖 |
 
-**未写任何说明** → `playwright-headed`（自带 Chromium + 有头 + slowMo 1000）。
+**未写任何说明** → `playwright-headed`（自带 Chromium + 有头 + slowMo 1000 + 默认最大化）。
 
 ---
 
@@ -44,7 +45,7 @@
 ## 4. 标准 CLI
 
 ```bash
-cd test-artifacts
+# 在包含 test-artifacts/ 的目录执行（scripts/ 与 test-artifacts/ 同级），不要 cd test-artifacts
 
 # 默认：自带 Chromium + 有头
 node scripts/run-functional-tests.mjs --limit 20
@@ -58,6 +59,13 @@ node scripts/run-functional-tests.mjs --headless --limit 20
 # 本地 Chrome + 无头
 node scripts/run-functional-tests.mjs --profile local-chrome-headless --all
 ```
+
+## 4.1 有头默认最大化约定
+
+- `playwright-headed` 与 `local-chrome-headed` 默认都应使用：
+  - `launchOptions.args: ["--start-maximized"]`
+  - `contextOptions.viewport: null`
+- 若用户明确指定窗口尺寸（例如 1366x768），再改为固定 `viewport`
 
 ---
 
