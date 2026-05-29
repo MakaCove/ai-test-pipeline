@@ -2,7 +2,7 @@
 
 `ai-test-pipeline` 是一套面向 AI Agent 的测试流水线技能包，覆盖：
 
-- 项目分析（索引地图）
+- 项目分析（索引地图 + 主流程候选预标注）
 - 接口用例生成（**API 主流程**驱动，支持 mockData）
 - 功能用例生成（**业务主流程**驱动）
 - 接口执行与 Markdown 报告
@@ -14,9 +14,9 @@
 
 ## 1. 目录总览
 
-- `project-analyzer/`：扫描项目入口层，输出 `project-analysis`
-- `api-test-case-generate/`：基于 Controller/DTO 识别**业务主流程**并生成 API 用例
-- `functional-test-case-generate/`：基于 Router/View 识别**业务主流程**并生成 UI 用例
+- `project-analyzer/`：扫描项目入口层，输出 `project-analysis`（含 `mainFlowCandidates`、`stateHints`、`pageEntryHints`）
+- `api-test-case-generate/`：基于 Controller/DTO 确认主流程候选并生成 API 用例
+- `functional-test-case-generate/`：基于 Router/View 确认主流程候选并生成 UI 用例
 - `api-test-execute/`：执行 API 用例并生成 Markdown 报告
 - `ui-test-execute/`：执行功能用例并生成 Markdown 报告
 - `_shared/`：全局 Schema、术语、断言语法、报告模板（索引见 `_shared/目录.md`）
@@ -39,8 +39,9 @@
 ## 2. 推荐使用顺序（标准闭环）
 
 1. 运行 `project-analyzer`
-   - 输出：`test-artifacts/project-analysis-{ts}.json`
+   - 输出：`test-artifacts/project-analysis-{ts}.json`（含 `mainFlowCandidates`、`stateHints`）
 2. 运行 `api-test-case-generate` 与 `functional-test-case-generate`
+   - 确认/扩展 `mainFlowCandidates` → `mainFlowInventory`
    - 输出：
    - `test-artifacts/api-cases/api-cases-{ts}.json`
    - `test-artifacts/functional-cases/functional-cases-{ts}.json`
@@ -64,20 +65,31 @@
 
 ## 4. 关键数据流
 
-- 分析层（地图）：`project-analysis`
+- 分析层（地图 + 候选）：`project-analysis`
   - `modules[].endpoints[]`、`modules[].routes[]`
   - `auth`、`scanLimitations`、`chainHints`
+  - `stateHints`（状态机线索）、`mainFlowCandidates`（主流程候选）、`pageEntryHints`（页面入口）
 - 生成层（清单 + 用例）：
-  - API：`coverage.mainFlowInventory` + `mockData` + `flowChains`
-  - UI：`coverage.mainFlowInventory` + `routeMenuMap` + `flowChains`
-  - 追溯：API `flowRef`、UI `featureRefs` → `FLOW-*`
-  - 链路：`dependsOnCases`、`produces`、`consumes`（UI 可含 `steps.saveAs/useVar`）
+  - API：`coverage.mainFlowInventory` + `mockData` + `trace` 链路分组
+  - UI：`coverage.mainFlowInventory` + `routeMenuMap` + `trace` 链路分组
+  - 追溯：`trace.flowRefs` → `FLOW-*`
+  - 链路：`trace.dependsOn`、`trace.produces`、`trace.consumes`（UI 可含 `steps.saveAs/useVar`）
 - 执行层（确定性执行器）：
   - 依赖校验、变量消费/产出校验、断言判定、Markdown 报告生成
 
 ---
 
-## 5. 产物清单
+## 5. 编码体系
+
+| 类型 | 格式 | 示例 |
+|------|------|------|
+| 主流程 | `FLOW-{MODULE}-{序号}` | `FLOW-ORDERS-001` |
+| API 用例 | `TC-API-{MODULE}-{序号}` | `TC-API-ORDERS-001` |
+| UI 用例 | `TC-FUNC-{MODULE}-{序号}` | `TC-FUNC-ORDERS-001` |
+
+---
+
+## 6. 产物清单
 
 统一产物目录：`test-artifacts/`
 
@@ -91,9 +103,9 @@
 
 ---
 
-## 6. 常用命令
+## 7. 常用命令
 
-### 6.1 执行
+### 7.1 执行
 
 ```bash
 # API（零依赖，Node 内置 fetch）
@@ -109,7 +121,7 @@ node scripts/run-functional-tests.mjs --local-chrome --limit 20
 node scripts/run-functional-tests.mjs --headless --all
 ```
 
-### 6.2 npm scripts（等价入口）
+### 7.2 npm scripts（等价入口）
 
 ```bash
 npm run test:api
@@ -118,7 +130,7 @@ npm run test:ui
 
 ---
 
-## 7. 适用与边界
+## 8. 适用与边界
 
 - 适用：前后端分离项目、全栈单体、以 REST/页面路由为主的系统
 - 不适合直接覆盖：纯性能压测、复杂流媒体协议、无稳定接口契约的临时系统
@@ -126,21 +138,23 @@ npm run test:ui
 
 ---
 
-## 8. 常见误用（务必避免）
+## 9. 常见误用（务必避免）
 
 - 用例按固定条数模板生成（如每端点/路由固定 N 条）
 - 未读 DTO/View 就写契约/功能点
 - 写死账号口令或主键（如 `admin/123admin`、`id=1`）
-- 有业务依赖却不写链路字段（`dependsOnCases`、`produces/consumes`）
+- 有业务依赖却不写链路字段（`trace.dependsOn`、`trace.produces/consumes`）
 - 未启动后端/前端服务就执行用例
+- 仅凭"灵感"归纳主流程，不做交叉检查/菜单遍历
 
 ---
 
-## 9. 快速验收清单
+## 10. 快速验收清单
 
-- [ ] `project-analysis` 含 `scanLimitations`，且字段如实
-- [ ] API 与功能用例都包含各自 coverage 清单（API：`mainFlowInventory`；UI：`mainFlowInventory`）
+- [ ] `project-analysis` 含 `scanLimitations`、`mainFlowCandidates`，且字段如实
+- [ ] API 与功能用例都包含各自 `coverage.mainFlowInventory`
 - [ ] 主流程覆盖率 100%（API + UI）
+- [ ] 用例 ID 统一 `TC-API/FUNC-{MODULE}-{序号}`，无旧编码
 - [ ] 执行成功产出 Markdown 报告（API + UI）
 - [ ] 报告中含覆盖率统计与失败/跳过明细
 
