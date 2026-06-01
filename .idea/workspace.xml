@@ -4,14 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b1a3b2d-feca-4677-97d3-258407edfff3" name="Changes" comment="docs(readme): 更新文档说明主流程候选预标注与链路字段&#10;&#10;- 添加主流程候选预标注说明&#10;- 更新目录总览描述&#10;- 添加编码体系表格&#10;- 修改链路字段为trace分组&#10;- 更新常用命令编号&#10;- 调整验收清单内容&#10;- 更新各模块SKILL文档说明&#10;- 修改链路字段从dependsOnCases等改为trace分组&#10;- 添加四维度交叉检查说明&#10;- 添加菜单遍历法说明">
+    <list default="true" id="0b1a3b2d-feca-4677-97d3-258407edfff3" name="Changes" comment="feat(ui-test): 实现浏览器自动解析和配置管理功能&#10;&#10;- 新增自动浏览器解析机制，支持固定缓存 chromium 和系统 Chrome&#10;- 添加 ui-test.config.json 配置文件支持，可自定义浏览器路径和优先级&#10;- 实现 auto-headed 默认配置，优先使用固定缓存或系统 Chrome&#10;- 更新命令行参数说明，--local-chrome 改为强制系统 Chrome 模式&#10;- 重构浏览器引擎选择逻辑，支持 fixed-chromium、system-chrome 等多种模式&#10;- 添加 Playwright 模块路径解析和版本检测功能&#10;- 更新文档说明，包括浏览器配置和执行流程相关内容">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/ui-test-profile模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/_shared/ui-test-profile模板.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/run-functional-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run-functional-tests.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/工作流.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/浏览器配置.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/浏览器配置.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,16 +46,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/shian/.cursor/skills/ai-test-pipeline",
+    "settings.editor.selected.configurable": "vcs.Git"
   }
-}</component>
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="ai-test-pipeline" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="ai-test-pipeline" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -101,7 +109,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780045373337</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="feat(ui-test): 实现浏览器自动解析和配置管理功能&#10;&#10;- 新增自动浏览器解析机制，支持固定缓存 chromium 和系统 Chrome&#10;- 添加 ui-test.config.json 配置文件支持，可自定义浏览器路径和优先级&#10;- 实现 auto-headed 默认配置，优先使用固定缓存或系统 Chrome&#10;- 更新命令行参数说明，--local-chrome 改为强制系统 Chrome 模式&#10;- 重构浏览器引擎选择逻辑，支持 fixed-chromium、system-chrome 等多种模式&#10;- 添加 Playwright 模块路径解析和版本检测功能&#10;- 更新文档说明，包括浏览器配置和执行流程相关内容">
+      <option name="closed" value="true" />
+      <created>1780050731056</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1780050731056</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -120,6 +136,7 @@
     <MESSAGE value="docs(guidelines): 更新文档规范和示例内容&#10;&#10;- 修改了范围定义文档的内容结构&#10;- 更新了工作流执行流程的相关描述&#10;- 调整了结果判定规则的具体条款&#10;- 完善了完整示例中的操作指南&#10;- 优化了智能编排相关文档内容&#10;- 重新整理了产物目录布局说明&#10;- 改进了架构与流程的设计描述" />
     <MESSAGE value="docs(test): 删除测试流程相关文档&#10;&#10;- 移除 .idea 目录的 gitignore 配置&#10;- 删除 API 测试用例生成的相关文档&#10;- 删除 API 测试执行的相关文档&#10;- 删除功能测试用例生成的相关文档&#10;- 删除项目分析器的相关文档&#10;- 删除 UI 测试执行的相关文档&#10;- 清理测试流程定义和工作流说明文件" />
     <MESSAGE value="docs(readme): 更新文档说明主流程候选预标注与链路字段&#10;&#10;- 添加主流程候选预标注说明&#10;- 更新目录总览描述&#10;- 添加编码体系表格&#10;- 修改链路字段为trace分组&#10;- 更新常用命令编号&#10;- 调整验收清单内容&#10;- 更新各模块SKILL文档说明&#10;- 修改链路字段从dependsOnCases等改为trace分组&#10;- 添加四维度交叉检查说明&#10;- 添加菜单遍历法说明" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(readme): 更新文档说明主流程候选预标注与链路字段&#10;&#10;- 添加主流程候选预标注说明&#10;- 更新目录总览描述&#10;- 添加编码体系表格&#10;- 修改链路字段为trace分组&#10;- 更新常用命令编号&#10;- 调整验收清单内容&#10;- 更新各模块SKILL文档说明&#10;- 修改链路字段从dependsOnCases等改为trace分组&#10;- 添加四维度交叉检查说明&#10;- 添加菜单遍历法说明" />
+    <MESSAGE value="feat(ui-test): 实现浏览器自动解析和配置管理功能&#10;&#10;- 新增自动浏览器解析机制，支持固定缓存 chromium 和系统 Chrome&#10;- 添加 ui-test.config.json 配置文件支持，可自定义浏览器路径和优先级&#10;- 实现 auto-headed 默认配置，优先使用固定缓存或系统 Chrome&#10;- 更新命令行参数说明，--local-chrome 改为强制系统 Chrome 模式&#10;- 重构浏览器引擎选择逻辑，支持 fixed-chromium、system-chrome 等多种模式&#10;- 添加 Playwright 模块路径解析和版本检测功能&#10;- 更新文档说明，包括浏览器配置和执行流程相关内容" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(ui-test): 实现浏览器自动解析和配置管理功能&#10;&#10;- 新增自动浏览器解析机制，支持固定缓存 chromium 和系统 Chrome&#10;- 添加 ui-test.config.json 配置文件支持，可自定义浏览器路径和优先级&#10;- 实现 auto-headed 默认配置，优先使用固定缓存或系统 Chrome&#10;- 更新命令行参数说明，--local-chrome 改为强制系统 Chrome 模式&#10;- 重构浏览器引擎选择逻辑，支持 fixed-chromium、system-chrome 等多种模式&#10;- 添加 Playwright 模块路径解析和版本检测功能&#10;- 更新文档说明，包括浏览器配置和执行流程相关内容" />
   </component>
 </project>
