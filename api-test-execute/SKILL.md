@@ -1,24 +1,25 @@
 ---
 name: api-test-execute
-description: 读取接口测试用例 JSON，由 run-api-tests.mjs 发送 HTTP 请求并验证断言，生成 Markdown 报告。当用户要求执行接口测试时使用。
+description: 执行 API 用例并生成 Markdown 报告。
 disable-model-invocation: true
 ---
 
-# 接口测试执行器
+# api-test-execute
 
-确定性脚本 `scripts/run-api-tests.mjs`：依赖排序、mockData/`{{var}}` 替换、断言、Markdown 报告。
+确定性脚本 `scripts/run-api-tests.mjs`：依赖排序、变量流转、断言判定、Markdown 报告。
 
-## 文档
+## 文档索引
 
-- [工作流.md](工作流.md) — 前置条件、CLI、执行步骤
-- [结果判定与示例.md](结果判定与示例.md) — 状态、链路规则、报告摘要
-- `_shared/断言语法.md` — 断言算子
+| 文档 | 说明 |
+|------|------|
+| [01_工作流.md](01_工作流.md) | 执行步骤 |
+| [02_结果判定与示例.md](02_结果判定与示例.md) | 判定规则与示例 |
 
-## 快速开始
+## 执行
 
 ```bash
+node scripts/validate-artifacts.mjs --type api
 node scripts/run-api-tests.mjs
-node scripts/run-api-tests.mjs --base-url http://localhost:8080 --limit 20
 ```
 
-报告：`test-artifacts/api-reports/api-report-{ts}.md`
+参考：[shared/06_断言语法.md](../shared/06_断言语法.md)
