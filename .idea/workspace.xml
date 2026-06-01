@@ -4,8 +4,69 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b1a3b2d-feca-4677-97d3-258407edfff3" name="Changes" comment="feat(ui-test): 实现浏览器自动解析和配置管理功能&#10;&#10;- 新增自动浏览器解析机制，支持固定缓存 chromium 和系统 Chrome&#10;- 添加 ui-test.config.json 配置文件支持，可自定义浏览器路径和优先级&#10;- 实现 auto-headed 默认配置，优先使用固定缓存或系统 Chrome&#10;- 更新命令行参数说明，--local-chrome 改为强制系统 Chrome 模式&#10;- 重构浏览器引擎选择逻辑，支持 fixed-chromium、system-chrome 等多种模式&#10;- 添加 Playwright 模块路径解析和版本检测功能&#10;- 更新文档说明，包括浏览器配置和执行流程相关内容">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="0b1a3b2d-feca-4677-97d3-258407edfff3" name="Changes" comment="chore(ide): 添加IDE配置文件并更新工作空间设置&#10;&#10;- 添加 .idea/vcs.xml 配置文件&#10;- 更新 workspace.xml 中的浏览器自动解析和配置管理功能记录&#10;- 保留最近的提交消息历史记录&#10;- 添加运行配置管理器设置&#10;- 保持项目属性组件的配置信息完整">
+      <change afterPath="$PROJECT_DIR$/api-test-case-generate/01_工作流.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-test-case-generate/02_主流程识别与设计.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-test-case-generate/04_验收与输出.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-test-execute/01_工作流.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-test-execute/02_结果判定与示例.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project-analyzer/02_输出规范.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project-analyzer/04_下游衔接.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/validate-artifacts.mjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shared/01_目录.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shared/02_统一术语.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shared/07_选择器策略.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shared/08_产物目录布局.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shared/09_ui-test-profile模板.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-test-case-generate/01_工作流.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-test-case-generate/02_主流程识别与设计.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-test-case-generate/05_验收与输出.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-test-case-generate/SKILL.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-test-execute/01_工作流.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-test-execute/02_浏览器配置.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-test-execute/03_结果判定与示例.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/ui-test-profile模板.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/产物目录布局.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/功能用例结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/05_UI用例结构.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/接口报告模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/10_接口报告模板.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/接口用例结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/04_接口用例结构.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/断言语法.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/06_断言语法.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/界面报告模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/11_UI报告模板.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/目录.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/统一术语.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/选择器策略.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_shared/项目分析结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/03_项目分析结构.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-case-generate/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-case-generate/主流程识别与设计.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-case-generate/完整示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/05_完整示例.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-case-generate/工作流.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-case-generate/智能编排.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/03_智能编排.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-case-generate/验收与输出.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-execute/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-execute/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-execute/工作流.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-execute/结果判定与示例.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/SKILL.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/主流程识别与设计.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/完整示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-case-generate/06_完整示例.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/工作流.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/智能编排.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-case-generate/04_智能编排.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/菜单导航与步骤.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-case-generate/03_菜单导航与步骤.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/验收与输出.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-analyzer/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-analyzer/下游衔接.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-analyzer/多栈扫描指南.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/03_多栈扫描指南.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-analyzer/完整示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/05_完整示例.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-analyzer/工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/01_工作流.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-analyzer/输出规范.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/run-api-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run-api-tests.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/run-functional-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run-ui-tests.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-test-execute/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-test-execute/工作流.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-test-execute/浏览器配置.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-test-execute/结果判定与示例.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/架构与流程.md" beforeDir="false" afterPath="$PROJECT_DIR$/架构与流程.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +178,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780050731056</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="chore(ide): 添加IDE配置文件并更新工作空间设置&#10;&#10;- 添加 .idea/vcs.xml 配置文件&#10;- 更新 workspace.xml 中的浏览器自动解析和配置管理功能记录&#10;- 保留最近的提交消息历史记录&#10;- 添加运行配置管理器设置&#10;- 保持项目属性组件的配置信息完整">
+      <option name="closed" value="true" />
+      <created>1780277966413</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1780277966413</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -137,6 +206,7 @@
     <MESSAGE value="docs(test): 删除测试流程相关文档&#10;&#10;- 移除 .idea 目录的 gitignore 配置&#10;- 删除 API 测试用例生成的相关文档&#10;- 删除 API 测试执行的相关文档&#10;- 删除功能测试用例生成的相关文档&#10;- 删除项目分析器的相关文档&#10;- 删除 UI 测试执行的相关文档&#10;- 清理测试流程定义和工作流说明文件" />
     <MESSAGE value="docs(readme): 更新文档说明主流程候选预标注与链路字段&#10;&#10;- 添加主流程候选预标注说明&#10;- 更新目录总览描述&#10;- 添加编码体系表格&#10;- 修改链路字段为trace分组&#10;- 更新常用命令编号&#10;- 调整验收清单内容&#10;- 更新各模块SKILL文档说明&#10;- 修改链路字段从dependsOnCases等改为trace分组&#10;- 添加四维度交叉检查说明&#10;- 添加菜单遍历法说明" />
     <MESSAGE value="feat(ui-test): 实现浏览器自动解析和配置管理功能&#10;&#10;- 新增自动浏览器解析机制，支持固定缓存 chromium 和系统 Chrome&#10;- 添加 ui-test.config.json 配置文件支持，可自定义浏览器路径和优先级&#10;- 实现 auto-headed 默认配置，优先使用固定缓存或系统 Chrome&#10;- 更新命令行参数说明，--local-chrome 改为强制系统 Chrome 模式&#10;- 重构浏览器引擎选择逻辑，支持 fixed-chromium、system-chrome 等多种模式&#10;- 添加 Playwright 模块路径解析和版本检测功能&#10;- 更新文档说明，包括浏览器配置和执行流程相关内容" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(ui-test): 实现浏览器自动解析和配置管理功能&#10;&#10;- 新增自动浏览器解析机制，支持固定缓存 chromium 和系统 Chrome&#10;- 添加 ui-test.config.json 配置文件支持，可自定义浏览器路径和优先级&#10;- 实现 auto-headed 默认配置，优先使用固定缓存或系统 Chrome&#10;- 更新命令行参数说明，--local-chrome 改为强制系统 Chrome 模式&#10;- 重构浏览器引擎选择逻辑，支持 fixed-chromium、system-chrome 等多种模式&#10;- 添加 Playwright 模块路径解析和版本检测功能&#10;- 更新文档说明，包括浏览器配置和执行流程相关内容" />
+    <MESSAGE value="chore(ide): 添加IDE配置文件并更新工作空间设置&#10;&#10;- 添加 .idea/vcs.xml 配置文件&#10;- 更新 workspace.xml 中的浏览器自动解析和配置管理功能记录&#10;- 保留最近的提交消息历史记录&#10;- 添加运行配置管理器设置&#10;- 保持项目属性组件的配置信息完整" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(ide): 添加IDE配置文件并更新工作空间设置&#10;&#10;- 添加 .idea/vcs.xml 配置文件&#10;- 更新 workspace.xml 中的浏览器自动解析和配置管理功能记录&#10;- 保留最近的提交消息历史记录&#10;- 添加运行配置管理器设置&#10;- 保持项目属性组件的配置信息完整" />
   </component>
 </project>

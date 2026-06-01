@@ -28,6 +28,10 @@ disable-model-invocation: true
 - Canonical Schema：[shared/05_UI用例结构.md](../shared/05_UI用例结构.md)
 - 说明：UI 侧命名统一为 `ui-*`（目录、产物、schema、脚本）。
 
+## 生成后校验确认
+
+写入用例文件后，**先询问用户是否执行校验**，再根据用户选择运行或跳过。流程见 [01_工作流.md](01_工作流.md#校验确认生成后必做)。
+
 ## 执行
 
 ```bash

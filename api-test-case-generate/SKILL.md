@@ -1,4 +1,4 @@
----
+﻿---
 name: api-test-case-generate
 description: 基于 project-analysis 生成 API 用例。
 disable-model-invocation: true
@@ -25,6 +25,10 @@ disable-model-invocation: true
 - `test-artifacts/api-cases/api-cases-{ts}.json`
 - schema：`ai-test-pipeline/api-case/v2`
 - Canonical Schema：[shared/04_接口用例结构.md](../shared/04_接口用例结构.md)
+
+## 生成后校验确认
+
+写入用例文件后，**先询问用户是否执行校验**，再根据用户选择运行或跳过。流程见 [01_工作流.md](01_工作流.md#校验确认生成后必做)。
 
 ## 执行
 
