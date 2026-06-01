@@ -4,69 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b1a3b2d-feca-4677-97d3-258407edfff3" name="Changes" comment="chore(ide): 添加IDE配置文件并更新工作空间设置&#10;&#10;- 添加 .idea/vcs.xml 配置文件&#10;- 更新 workspace.xml 中的浏览器自动解析和配置管理功能记录&#10;- 保留最近的提交消息历史记录&#10;- 添加运行配置管理器设置&#10;- 保持项目属性组件的配置信息完整">
-      <change afterPath="$PROJECT_DIR$/api-test-case-generate/01_工作流.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api-test-case-generate/02_主流程识别与设计.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api-test-case-generate/04_验收与输出.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api-test-execute/01_工作流.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api-test-execute/02_结果判定与示例.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/project-analyzer/02_输出规范.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/project-analyzer/04_下游衔接.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/validate-artifacts.mjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shared/01_目录.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shared/02_统一术语.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shared/07_选择器策略.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shared/08_产物目录布局.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shared/09_ui-test-profile模板.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui-test-case-generate/01_工作流.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui-test-case-generate/02_主流程识别与设计.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui-test-case-generate/05_验收与输出.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui-test-case-generate/SKILL.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui-test-execute/01_工作流.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui-test-execute/02_浏览器配置.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui-test-execute/03_结果判定与示例.md" afterDir="false" />
+    <list default="true" id="0b1a3b2d-feca-4677-97d3-258407edfff3" name="Changes" comment="docs(guide): 更新测试用例生成流程文档并添加校验确认机制&#10;&#10;- 修改 API 和 UI 测试用例生成工作流，添加生成后校验确认步骤&#10;- 更新验收标准文档，明确用户选择校验时验证脚本应通过的要求&#10;- 在 README 中添加详细的使用步骤说明，包括项目分析、用例生成、校验和执行流程&#10;- 添加生成后交互说明，要求 Agent 询问用户是否执行校验而不是自动执行&#10;- 更新 SKILL 文档，添加生成后校验确认的相关说明&#10;- 修改 IDE 配置文件以反映最新的提交历史和任务记录">
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/ui-test-profile模板.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/产物目录布局.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/功能用例结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/05_UI用例结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/接口报告模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/10_接口报告模板.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/接口用例结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/04_接口用例结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/断言语法.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/06_断言语法.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/界面报告模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/11_UI报告模板.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/目录.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/统一术语.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/选择器策略.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_shared/项目分析结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/03_项目分析结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/主流程识别与设计.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/完整示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/05_完整示例.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/工作流.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/智能编排.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/03_智能编排.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/验收与输出.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-execute/01_工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-execute/01_工作流.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-execute/02_结果判定与示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-execute/02_结果判定与示例.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api-test-execute/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-execute/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-execute/工作流.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-execute/结果判定与示例.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/SKILL.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/主流程识别与设计.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/完整示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-case-generate/06_完整示例.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/工作流.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/智能编排.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-case-generate/04_智能编排.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/菜单导航与步骤.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-case-generate/03_菜单导航与步骤.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functional-test-case-generate/验收与输出.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/下游衔接.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/多栈扫描指南.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/03_多栈扫描指南.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/完整示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/05_完整示例.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/01_工作流.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/输出规范.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/run-api-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run-api-tests.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/run-functional-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run-ui-tests.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/run-ui-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run-ui-tests.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/validate-artifacts.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/validate-artifacts.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/03_项目分析结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/03_项目分析结构.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/05_UI用例结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/05_UI用例结构.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/08_产物目录布局.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/08_产物目录布局.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/09_ui-test-profile模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/09_ui-test-profile模板.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/10_接口报告模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/10_接口报告模板.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/11_UI报告模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/11_UI报告模板.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-test-execute/01_工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/01_工作流.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-test-execute/02_浏览器配置.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/02_浏览器配置.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-test-execute/03_结果判定与示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/03_结果判定与示例.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui-test-execute/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/工作流.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/浏览器配置.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/结果判定与示例.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/架构与流程.md" beforeDir="false" afterPath="$PROJECT_DIR$/架构与流程.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -186,7 +141,23 @@
       <option name="project" value="LOCAL" />
       <updated>1780277966413</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="docs: 更新文档结构与版本规范&#10;&#10;- 重命名 functional-test-case-generate 为 ui-test-case-generate&#10;- 更新所有文档中的 schema 版本从 v1 到 v2&#10;- 修改 package.json 中的 test:ui 脚本名称&#10;- 更新 README.md 为简化版本&#10;- 添加共享规范目录结构文档&#10;- 更新术语约定与选择器策略文档&#10;- 修正项目分析结构中的字段名称&#10;- 更新 API 和 UI 用例结构文档&#10;- 添加产物目录布局与浏览器配置文档&#10;- 更新报告模板文档中的字段引用&#10;- 修正断言语法文档中的测试类型引用">
+      <option name="closed" value="true" />
+      <created>1780280021180</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1780280021180</updated>
+    </task>
+    <task id="LOCAL-00007" summary="docs(guide): 更新测试用例生成流程文档并添加校验确认机制&#10;&#10;- 修改 API 和 UI 测试用例生成工作流，添加生成后校验确认步骤&#10;- 更新验收标准文档，明确用户选择校验时验证脚本应通过的要求&#10;- 在 README 中添加详细的使用步骤说明，包括项目分析、用例生成、校验和执行流程&#10;- 添加生成后交互说明，要求 Agent 询问用户是否执行校验而不是自动执行&#10;- 更新 SKILL 文档，添加生成后校验确认的相关说明&#10;- 修改 IDE 配置文件以反映最新的提交历史和任务记录">
+      <option name="closed" value="true" />
+      <created>1780280302738</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1780280302738</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -207,6 +178,8 @@
     <MESSAGE value="docs(readme): 更新文档说明主流程候选预标注与链路字段&#10;&#10;- 添加主流程候选预标注说明&#10;- 更新目录总览描述&#10;- 添加编码体系表格&#10;- 修改链路字段为trace分组&#10;- 更新常用命令编号&#10;- 调整验收清单内容&#10;- 更新各模块SKILL文档说明&#10;- 修改链路字段从dependsOnCases等改为trace分组&#10;- 添加四维度交叉检查说明&#10;- 添加菜单遍历法说明" />
     <MESSAGE value="feat(ui-test): 实现浏览器自动解析和配置管理功能&#10;&#10;- 新增自动浏览器解析机制，支持固定缓存 chromium 和系统 Chrome&#10;- 添加 ui-test.config.json 配置文件支持，可自定义浏览器路径和优先级&#10;- 实现 auto-headed 默认配置，优先使用固定缓存或系统 Chrome&#10;- 更新命令行参数说明，--local-chrome 改为强制系统 Chrome 模式&#10;- 重构浏览器引擎选择逻辑，支持 fixed-chromium、system-chrome 等多种模式&#10;- 添加 Playwright 模块路径解析和版本检测功能&#10;- 更新文档说明，包括浏览器配置和执行流程相关内容" />
     <MESSAGE value="chore(ide): 添加IDE配置文件并更新工作空间设置&#10;&#10;- 添加 .idea/vcs.xml 配置文件&#10;- 更新 workspace.xml 中的浏览器自动解析和配置管理功能记录&#10;- 保留最近的提交消息历史记录&#10;- 添加运行配置管理器设置&#10;- 保持项目属性组件的配置信息完整" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore(ide): 添加IDE配置文件并更新工作空间设置&#10;&#10;- 添加 .idea/vcs.xml 配置文件&#10;- 更新 workspace.xml 中的浏览器自动解析和配置管理功能记录&#10;- 保留最近的提交消息历史记录&#10;- 添加运行配置管理器设置&#10;- 保持项目属性组件的配置信息完整" />
+    <MESSAGE value="docs: 更新文档结构与版本规范&#10;&#10;- 重命名 functional-test-case-generate 为 ui-test-case-generate&#10;- 更新所有文档中的 schema 版本从 v1 到 v2&#10;- 修改 package.json 中的 test:ui 脚本名称&#10;- 更新 README.md 为简化版本&#10;- 添加共享规范目录结构文档&#10;- 更新术语约定与选择器策略文档&#10;- 修正项目分析结构中的字段名称&#10;- 更新 API 和 UI 用例结构文档&#10;- 添加产物目录布局与浏览器配置文档&#10;- 更新报告模板文档中的字段引用&#10;- 修正断言语法文档中的测试类型引用" />
+    <MESSAGE value="docs(guide): 更新测试用例生成流程文档并添加校验确认机制&#10;&#10;- 修改 API 和 UI 测试用例生成工作流，添加生成后校验确认步骤&#10;- 更新验收标准文档，明确用户选择校验时验证脚本应通过的要求&#10;- 在 README 中添加详细的使用步骤说明，包括项目分析、用例生成、校验和执行流程&#10;- 添加生成后交互说明，要求 Agent 询问用户是否执行校验而不是自动执行&#10;- 更新 SKILL 文档，添加生成后校验确认的相关说明&#10;- 修改 IDE 配置文件以反映最新的提交历史和任务记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(guide): 更新测试用例生成流程文档并添加校验确认机制&#10;&#10;- 修改 API 和 UI 测试用例生成工作流，添加生成后校验确认步骤&#10;- 更新验收标准文档，明确用户选择校验时验证脚本应通过的要求&#10;- 在 README 中添加详细的使用步骤说明，包括项目分析、用例生成、校验和执行流程&#10;- 添加生成后交互说明，要求 Agent 询问用户是否执行校验而不是自动执行&#10;- 更新 SKILL 文档，添加生成后校验确认的相关说明&#10;- 修改 IDE 配置文件以反映最新的提交历史和任务记录" />
   </component>
 </project>

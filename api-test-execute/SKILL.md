@@ -1,4 +1,4 @@
----
+﻿---
 name: api-test-execute
 description: 执行 API 用例并生成 Markdown 报告。
 disable-model-invocation: true
@@ -17,9 +17,11 @@ disable-model-invocation: true
 
 ## 执行
 
+测试地址由用户提供（`meta.baseUrl` 或 `--base-url`），技能包不写死环境地址。
+
 ```bash
 node scripts/validate-artifacts.mjs --type api
-node scripts/run-api-tests.mjs
+node scripts/run-api-tests.mjs --base-url <测试地址>
 ```
 
 参考：[shared/06_断言语法.md](../shared/06_断言语法.md)

@@ -7,7 +7,6 @@ import fs from "node:fs";
 import path from "node:path";
 
 const DEFAULT_TIMEOUT = 30000;
-const DEFAULT_BASE_URL = "http://localhost:8080";
 const V1_FIELDS = ["dependsOnCases", "consumes", "produces", "flowRef", "featureRefs", "contractRef", "scenarioRef"];
 
 function parseArgs(argv) {
@@ -41,7 +40,7 @@ const HELP = `用法:
 
 选项:
   --artifacts-dir <dir>  产物根目录（默认 ./test-artifacts）
-  --base-url <url>       覆盖 baseUrl
+  --base-url <url>       指定测试地址（覆盖用例 meta.baseUrl）
   --limit <n>            仅执行前 n 条（按 executionOrder）
   --all                  执行全部（默认）
   --module <name>        仅执行指定 module
@@ -181,6 +180,71 @@ function ensureV2Shape(meta, cases) {
   }
 }
 
+function buildRequestSnapshot(req, baseUrl) {
+  const method = req.method || "GET";
+  const url = `${baseUrl || ""}${req.path || ""}`;
+  const headers = {
+    ...(req.body !== undefined && method !== "GET" ? { "Content-Type": "application/json" } : {}),
+    ...(req.headers || {}),
+  };
+  let body = req.body;
+  if (body === "__FORM__") body = "(multipart/form)";
+  return { method, url, headers, body };
+}
+
+function buildResponseSnapshot(resp) {
+  if (!resp) return null;
+  if (resp.error) return { error: resp.error };
+  return {
+    status: resp.status,
+    headers: resp.headers,
+    body: resp.body ?? resp.bodyText ?? null,
+  };
+}
+
+function formatJsonBlock(value, maxLen = 8000) {
+  if (value === undefined) return "_无_";
+  let text;
+  if (typeof value === "string") text = value;
+  else {
+    try { text = JSON.stringify(value, null, 2); } catch { text = String(value); }
+  }
+  if (text.length > maxLen) {
+    text = `${text.slice(0, maxLen)}\n... (已截断，共 ${text.length} 字符)`;
+  }
+  return `\`\`\`json\n${text}\n\`\`\``;
+}
+
+function renderRequestResponseSection(request, response) {
+  let md = "";
+  if (request) {
+    md += "**请求**\n\n";
+    md += `- **Method**：\`${request.method}\`\n`;
+    md += `- **URL**：\`${request.url}\`\n\n`;
+    md += "**Headers**\n\n";
+    md += `${formatJsonBlock(request.headers)}\n\n`;
+    if (request.body !== undefined) {
+      md += "**Body（入参）**\n\n";
+      md += `${formatJsonBlock(request.body)}\n\n`;
+    }
+  }
+  if (response) {
+    md += "**响应**\n\n";
+    if (response.error) {
+      md += `- **错误**：${response.error}\n\n`;
+    } else {
+      md += `- **Status**：\`${response.status}\`\n\n`;
+      md += "**Headers**\n\n";
+      md += `${formatJsonBlock(response.headers)}\n\n`;
+      md += "**Body（响应体）**\n\n";
+      md += `${formatJsonBlock(response.body)}\n\n`;
+    }
+  } else if (request) {
+    md += "**响应**：_未发起请求_\n\n";
+  }
+  return md;
+}
+
 function orderCases(cases) {
   const hasOrder = cases.every((c) => Number.isFinite(c.executionOrder));
   if (hasOrder) return [...cases].sort((a, b) => a.executionOrder - b.executionOrder);
@@ -240,6 +304,8 @@ async function runCase(testCase, vars, opts, completed) {
     durationMs: 0,
     assertions: [],
     error: null,
+    request: null,
+    response: null,
     isChain: Boolean((testCase.trace.dependsOn || []).length || (testCase.trace.consumes || []).length || (testCase.trace.produces || []).length),
   };
 
@@ -272,14 +338,12 @@ async function runCase(testCase, vars, opts, completed) {
   }
 
   const req = substitute(testCase.request || {}, vars);
-  const url = `${opts.baseUrl || ""}${req.path || ""}`;
-  const method = req.method || "GET";
+  result.request = buildRequestSnapshot(req, opts.baseUrl);
+  const url = result.request.url;
+  const method = result.request.method;
   const init = {
     method,
-    headers: {
-      ...(req.body && method !== "GET" ? { "Content-Type": "application/json" } : {}),
-      ...(req.headers || {}),
-    },
+    headers: { ...result.request.headers },
   };
   if (req.body !== undefined && method !== "GET" && req.body !== "__FORM__") {
     init.body = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
@@ -288,6 +352,7 @@ async function runCase(testCase, vars, opts, completed) {
   const t0 = Date.now();
   const resp = await sendRequest(url, init, opts.timeout);
   result.durationMs = Date.now() - t0;
+  result.response = buildResponseSnapshot(resp);
   if (resp.error) {
     result.status = "failed";
     result.error = failField(testCase.module, testCase.id, "request", resp.error);
@@ -371,12 +436,20 @@ function buildMarkdown(meta, results, caseFile, baseUrl, durationMs) {
       md += `- **优先级**：${item.priority}\n`;
       md += `- **追溯主流程**：${item.flowRefs.join(", ")}\n`;
       md += `- **错误信息**：${item.error || "无"}\n\n`;
+      md += renderRequestResponseSection(item.request, item.response);
+      md += "---\n\n";
     }
   }
   md += "## 全部用例明细\n\n";
   md += "| ID | 模块 | 标题 | 主流程 | 优先级 | 结果 | 耗时 |\n|----|------|------|--------|--------|------|------|\n";
   for (const item of results) {
     md += `| ${item.id} | ${item.module} | ${item.title} | ${item.flowRefs.join(",")} | ${item.priority} | ${icon(item.status)} | ${item.durationMs}ms |\n`;
+  }
+  md += "\n## 用例请求与响应明细\n\n";
+  for (const item of results) {
+    md += `### ${icon(item.status)} ${item.id} — ${item.title}\n\n`;
+    md += renderRequestResponseSection(item.request, item.response);
+    md += "---\n\n";
   }
   return md;
 }
@@ -417,7 +490,12 @@ async function main() {
     process.exit(1);
   }
 
-  opts.baseUrl = opts.baseUrl || meta.baseUrl || DEFAULT_BASE_URL;
+  const baseUrl = opts.baseUrl || meta.baseUrl;
+  if (!baseUrl) {
+    console.error("❌ 缺少测试地址 baseUrl。请通过 --base-url 传入，或在用例 meta.baseUrl 中填写。");
+    process.exit(1);
+  }
+  opts.baseUrl = baseUrl;
   const vars = {};
   if (meta.mockData && typeof meta.mockData === "object") Object.assign(vars, meta.mockData);
   const account = meta.testAccount || meta.auth?.testAccount;

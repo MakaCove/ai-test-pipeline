@@ -8,7 +8,6 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
-const DEFAULT_BASE_URL = "http://localhost:5173";
 const V1_FIELDS = ["dependsOnCases", "consumes", "produces", "featureRef", "featureRefs"];
 
 function parseArgs(argv) {
@@ -48,7 +47,7 @@ const HELP = `用法:
 
 选项:
   --artifacts-dir <dir>  产物根目录（默认 ./test-artifacts）
-  --base-url <url>       覆盖 baseUrl
+  --base-url <url>       指定测试地址（覆盖用例 meta.baseUrl）
   --profile <name>       ui-test.config.json 中的 profile
   --local-chrome         强制系统 Chrome
   --headless             无头模式（须明确指定）
@@ -226,7 +225,21 @@ function resolveProfile(opts, cfg) {
   const profile = { ...(cfg?.profiles?.[name] || builtin[name] || builtin["auto-headed"]) };
   if (opts.headless) profile.headed = false;
   if (opts.slowMo != null) profile.slowMo = opts.slowMo;
-  return { name, profile };
+  return { name, profile: applyHeadedWindowDefaults(profile) };
+}
+
+/** 有头模式默认最大化窗口（launch args + viewport: null） */
+function applyHeadedWindowDefaults(profile) {
+  if (!profile.headed) return profile;
+  const launchOptions = { ...(profile.launchOptions || {}) };
+  const args = new Set(Array.isArray(launchOptions.args) ? launchOptions.args : []);
+  args.add("--start-maximized");
+  launchOptions.args = [...args];
+  return {
+    ...profile,
+    launchOptions,
+    contextOptions: { viewport: null, ...(profile.contextOptions || {}) },
+  };
 }
 
 function ensureV2Shape(meta, cases) {
@@ -294,22 +307,84 @@ function subst(str, vars) {
   return str.replace(/\{\{(\w+)\}\}/g, (m, n) => (n in vars ? vars[n] : m));
 }
 
-async function locate(page, desc) {
-  const text = String(desc || "").trim();
+function parseLocateDesc(desc) {
+  const raw = String(desc || "").trim();
+  const dialog = raw.match(/^dialog:([^|]+)\|(.+)$/);
+  if (dialog) {
+    return { scope: "dialog", dialogTitle: dialog[1].trim(), text: dialog[2].trim() };
+  }
+  return { scope: "page", text: raw };
+}
+
+function dialogRoot(page, titlePart) {
+  return page.getByRole("dialog").filter({ hasText: titlePart });
+}
+
+async function locateInRoot(root, text) {
   if (!text) return null;
   const tid = text.match(/^testid=(.+)$/);
-  if (tid) return { locator: page.getByTestId(tid[1]), strategy: `testid=${tid[1]}` };
-  for (const role of ["button", "link", "menuitem", "tab"]) {
-    const loc = page.getByRole(role, { name: text, exact: false });
+  if (tid) return { locator: root.getByTestId(tid[1]), strategy: `testid=${tid[1]}` };
+  const roleMatch = text.match(/^role=(\w+)\|(.+)$/);
+  if (roleMatch) {
+    const loc = root.getByRole(roleMatch[1], { name: roleMatch[2], exact: false });
+    if (await loc.count().catch(() => 0)) return { locator: loc.first(), strategy: `role=${roleMatch[1]}[name=${roleMatch[2]}]` };
+  }
+  for (const role of ["button", "link", "menuitem", "tab", "checkbox"]) {
+    const loc = root.getByRole(role, { name: text, exact: false });
     if (await loc.count().catch(() => 0)) return { locator: loc.first(), strategy: `role=${role}[name=${text}]` };
   }
-  const byLabel = page.getByLabel(text, { exact: false });
+  const byLabel = root.getByLabel(text, { exact: false });
   if (await byLabel.count().catch(() => 0)) return { locator: byLabel.first(), strategy: `label=${text}` };
-  const byPh = page.getByPlaceholder(text, { exact: false });
+  const byPh = root.getByPlaceholder(text, { exact: false });
   if (await byPh.count().catch(() => 0)) return { locator: byPh.first(), strategy: `placeholder=${text}` };
-  const byText = page.getByText(text, { exact: false });
+  const byText = root.getByText(text, { exact: false });
   if (await byText.count().catch(() => 0)) return { locator: byText.first(), strategy: `text=${text}` };
   return null;
+}
+
+async function locate(page, desc) {
+  const parsed = parseLocateDesc(desc);
+  const root = parsed.scope === "dialog" ? dialogRoot(page, parsed.dialogTitle) : page;
+  const hit = await locateInRoot(root, parsed.text);
+  if (!hit) return null;
+  if (parsed.scope === "dialog") hit.strategy = `dialog:${parsed.dialogTitle}>${hit.strategy}`;
+  return hit;
+}
+
+async function clickLocator(locator) {
+  const role = await locator.getAttribute("role").catch(() => null);
+  const type = await locator.getAttribute("type").catch(() => null);
+  const cls = String((await locator.getAttribute("class").catch(() => "")) || "");
+  const ancestorClick = async (xpath) => {
+    const wrap = locator.locator(`xpath=${xpath}`);
+    if (await wrap.count().catch(() => 0)) {
+      await wrap.first().click({ timeout: 10000 });
+      return true;
+    }
+    return false;
+  };
+  if (role === "combobox" || cls.includes("el-select__input")) {
+    if (await ancestorClick("ancestor::*[contains(@class,'el-select')][1]")) return;
+  }
+  if (type === "radio" && cls.includes("el-radio-button__original-radio")) {
+    if (await ancestorClick("ancestor::*[contains(@class,'el-radio-button')][1]")) return;
+  }
+  if (type === "checkbox" && cls.includes("el-checkbox__original")) {
+    if (await ancestorClick("ancestor::label[contains(@class,'el-checkbox')][1]")) return;
+    if (await ancestorClick("ancestor::*[contains(@class,'el-checkbox')][1]")) return;
+  }
+  await locator.click({ timeout: 10000 });
+}
+
+async function pickSelectDropdownItem(page, value) {
+  const popper = page.locator(".el-select-dropdown:visible");
+  await popper.waitFor({ state: "visible", timeout: 8000 });
+  const val = String(value || "first").trim();
+  const item =
+    val === "first"
+      ? popper.locator(".el-select-dropdown__item:not(.is-disabled)").first()
+      : popper.locator(".el-select-dropdown__item").filter({ hasText: val }).first();
+  await item.click({ timeout: 8000 });
 }
 
 function resolveMenuLabel(rawTarget, menuMap) {
@@ -327,7 +402,7 @@ async function runStep(page, step, vars, baseUrl, menuMap) {
   const click = async (desc) => {
     const hit = await locate(page, desc);
     if (!hit) return { ok: false, error: `未定位到元素：${desc}` };
-    await hit.locator.click({ timeout: 10000 });
+    await clickLocator(hit.locator);
     return { ok: true, strategy: hit.strategy };
   };
 
@@ -362,8 +437,20 @@ async function runStep(page, step, vars, baseUrl, menuMap) {
     case "select": {
       const hit = await locate(page, target);
       if (!hit) return { ok: false, error: `未定位到下拉：${target}` };
-      await hit.locator.selectOption({ label: String(value) }).catch(async () => { await hit.locator.click(); });
+      await hit.locator.selectOption({ label: String(value) }).catch(async () => { await clickLocator(hit.locator); });
       return { ok: true, strategy: hit.strategy, outputValue: String(value) };
+    }
+    case "select_dropdown": {
+      const hit = await locate(page, target);
+      if (!hit) return { ok: false, error: `未定位到下拉：${target}` };
+      try {
+        await clickLocator(hit.locator);
+        await page.waitForTimeout(400);
+        await pickSelectDropdownItem(page, value || "first");
+        return { ok: true, strategy: hit.strategy, outputValue: String(value || "first") };
+      } catch (e) {
+        return { ok: false, error: `下拉选择失败：${e.message}` };
+      }
     }
     case "hover": {
       const hit = await locate(page, target);
@@ -439,6 +526,7 @@ async function runCase(page, testCase, vars, completed, shotDir, ts) {
     assertions: [],
     steps: [],
     screenshot: "",
+    screenshots: [],
     error: null,
     isChain: Boolean((testCase.trace.dependsOn || []).length || (testCase.trace.consumes || []).length),
   };
@@ -488,6 +576,7 @@ async function runCase(page, testCase, vars, completed, shotDir, ts) {
     if (stepResult.screenshotHint) {
       const p = path.join(shotDir, `${testCase.id}_step${step.step}_${ts}.png`);
       await page.screenshot({ path: p }).catch(() => {});
+      result.screenshots.push({ label: `步骤 ${step.step}（${step.action}）`, path: p });
     }
     if (step.saveAs) {
       stepVars[step.saveAs] = stepResult.outputValue ?? String(step.value ?? "");
@@ -518,6 +607,7 @@ async function runCase(page, testCase, vars, completed, shotDir, ts) {
     const p = path.join(shotDir, `${testCase.id}_fail_${ts}.png`);
     await page.screenshot({ path: p }).catch(() => {});
     result.screenshot = p;
+    result.screenshots.push({ label: "失败截图", path: p });
   }
 
   for (const name of testCase.trace.produces || []) {
@@ -528,7 +618,40 @@ async function runCase(page, testCase, vars, completed, shotDir, ts) {
   return result;
 }
 
-function buildMarkdown(meta, results, caseFile, baseUrl, browser, durationMs) {
+function screenshotRelPath(reportDir, absPath) {
+  if (!absPath) return "";
+  return path.relative(reportDir, absPath).split(path.sep).join("/");
+}
+
+function renderScreenshotBlock(reportDir, screenshots) {
+  if (!screenshots?.length) return "**截图**：_无_\n\n";
+  let md = "**截图**\n\n";
+  for (const shot of screenshots) {
+    const rel = screenshotRelPath(reportDir, shot.path);
+    md += `- ${shot.label}\n\n`;
+    if (rel) md += `![${shot.label}](${rel})\n\n`;
+  }
+  return md;
+}
+
+function renderCaseDetailBlock(r, reportDir, icon) {
+  let md = `### ${icon(r.status)} ${r.id} — ${r.title}\n\n`;
+  md += `- **模块**：${r.module}\n`;
+  md += `- **优先级**：${r.priority}\n`;
+  md += `- **主流程**：${r.flowRefs.join(", ")}\n`;
+  md += `- **结果**：${r.status}\n`;
+  md += `- **耗时**：${(r.durationMs / 1000).toFixed(1)}s\n`;
+  if (r.error) md += `- **错误信息**：${r.error}\n`;
+  const failedAssertion = r.assertions?.find((a) => !a.pass);
+  if (failedAssertion) {
+    md += `- **失败断言**：${failedAssertion.type} — ${failedAssertion.target}\n`;
+  }
+  md += "\n";
+  md += renderScreenshotBlock(reportDir, r.screenshots);
+  return md;
+}
+
+function buildMarkdown(meta, results, caseFile, baseUrl, browser, durationMs, reportDir) {
   const total = results.length;
   const passed = results.filter((r) => r.status === "passed").length;
   const failed = results.filter((r) => r.status === "failed").length;
@@ -554,18 +677,20 @@ function buildMarkdown(meta, results, caseFile, baseUrl, browser, durationMs) {
   if (failures.length) {
     md += "## 失败/跳过用例\n\n";
     for (const r of failures) {
-      md += `### ${icon(r.status)} ${r.id} — ${r.title}\n\n`;
-      md += `- **模块**：${r.module}\n`;
-      md += `- **优先级**：${r.priority}\n`;
-      md += `- **追溯主流程**：${r.flowRefs.join(", ")}\n`;
-      md += `- **截图**：${r.screenshot || "无"}\n`;
-      md += `- **错误信息**：${r.error || "无"}\n\n`;
+      md += renderCaseDetailBlock(r, reportDir, icon);
+      md += "---\n\n";
     }
   }
   md += "## 全部用例明细\n\n";
   md += "| ID | 模块 | 标题 | 主流程 | 优先级 | 结果 | 耗时 |\n|----|------|------|--------|--------|------|------|\n";
   for (const r of results) {
     md += `| ${r.id} | ${r.module} | ${r.title} | ${r.flowRefs.join(",")} | ${r.priority} | ${icon(r.status)} | ${(r.durationMs / 1000).toFixed(1)}s |\n`;
+  }
+  md += "\n## 用例明细与截图\n\n";
+  md += "> 每条用例的截图紧跟在对应明细下方（路径相对报告文件 `screenshots/`）。\n\n";
+  for (const r of results) {
+    md += renderCaseDetailBlock(r, reportDir, icon);
+    md += "---\n\n";
   }
   return md;
 }
@@ -605,7 +730,11 @@ async function main() {
     process.exit(2);
   }
 
-  const baseUrl = opts.baseUrl || meta.baseUrl || DEFAULT_BASE_URL;
+  const baseUrl = opts.baseUrl || meta.baseUrl;
+  if (!baseUrl) {
+    console.error("❌ 缺少测试地址 baseUrl。请通过 --base-url 传入，或在用例 meta.baseUrl 中填写。");
+    process.exit(1);
+  }
   const { name: profileName, profile } = resolveProfile(opts, cfg);
   const selectedCases = filterCases(allCases, opts);
   const browserPlan = profile.engine === "auto"
@@ -664,7 +793,7 @@ async function main() {
   const passed = results.filter((r) => r.status === "passed").length;
   const failed = results.filter((r) => r.status === "failed").length;
   const skipped = results.filter((r) => r.status === "skipped").length;
-  const md = buildMarkdown(meta, results, caseFile, baseUrl, browserLabel, durationMs);
+  const md = buildMarkdown(meta, results, caseFile, baseUrl, browserLabel, durationMs, reportsDir);
   const reportPath = path.join(reportsDir, `ui-report-${ts}.md`);
   fs.writeFileSync(reportPath, md, "utf8");
 

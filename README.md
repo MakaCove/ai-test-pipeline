@@ -21,9 +21,9 @@
 ### 前置条件
 
 - Node.js >= 18
-- 被测项目的前后端服务已启动（API 默认 `http://localhost:8080`，UI 默认 `http://localhost:5173`）
-- UI 执行需安装 Playwright：`npm install playwright`（可选依赖）
-- 在**被测项目根目录**（或包含 `test-artifacts/` 的目录）执行下文命令
+- **测试地址由用户提供**：写入用例 `meta.baseUrl`，或执行时通过 `--base-url` 传入；技能包不写死任何环境地址
+- UI 执行需安装 Playwright（可选依赖）
+- 在**包含 `test-artifacts/` 的目录**执行下文命令（通常为被测项目根目录）
 
 ### 第 1 步：项目分析
 
@@ -62,15 +62,14 @@ node scripts/validate-artifacts.mjs --type ui
 ### 第 4 步：执行用例
 
 ```bash
-# API（零额外依赖）
-npm run test:api
-node scripts/run-api-tests.mjs --limit 20
-node scripts/run-api-tests.mjs --base-url http://localhost:8080
-
-# UI（Playwright）
+# UI（Playwright，测试地址由用户指定）
 npm run test:ui
-node scripts/run-ui-tests.mjs --limit 20
+node scripts/run-ui-tests.mjs --base-url <用户提供的地址> --limit 20
 node scripts/run-ui-tests.mjs --local-chrome --limit 20
+
+# API（测试地址由用户指定）
+npm run test:api
+node scripts/run-api-tests.mjs --base-url <用户提供的地址> --limit 20
 ```
 
 UI 浏览器配置见 `ui-test-execute/02_浏览器配置.md` 与 `shared/09_ui-test-profile模板.md`。

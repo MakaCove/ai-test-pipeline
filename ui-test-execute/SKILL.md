@@ -1,4 +1,4 @@
----
+﻿---
 name: ui-test-execute
 description: 执行 UI 用例并生成 Markdown 报告与截图。
 disable-model-invocation: true
@@ -18,9 +18,11 @@ disable-model-invocation: true
 
 ## 执行
 
+测试地址由用户提供（`meta.baseUrl` 或 `--base-url`），技能包不写死环境地址。
+
 ```bash
 node scripts/validate-artifacts.mjs --type ui
-node scripts/run-ui-tests.mjs
+node scripts/run-ui-tests.mjs --base-url <测试地址>
 ```
 
 参考：[shared/07_选择器策略.md](../shared/07_选择器策略.md)

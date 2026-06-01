@@ -54,6 +54,41 @@ function latestCaseFile(root, dirName, pattern) {
   return files[0]?.full || null;
 }
 
+function describeMissingFiles(opts, root) {
+  const lines = [
+    "❌ 未找到可校验的用例文件。",
+    "",
+    `当前工作目录：${process.cwd()}`,
+    `产物目录：${root}`,
+    "",
+    "脚本会在上述产物目录下查找：",
+  ];
+  if (opts.type === "all" || opts.type === "api") {
+    const apiDir = path.join(root, "api-cases");
+    const api = latestCaseFile(root, "api-cases", "api-cases-{ts}.json");
+    lines.push(`- API：${apiDir}/api-cases-*.json ${api ? `(命中 ${api})` : "(未找到)"}`);
+  }
+  if (opts.type === "all" || opts.type === "ui") {
+    const uiDir = path.join(root, "ui-cases");
+    const ui = latestCaseFile(root, "ui-cases", "ui-cases-{ts}.json");
+    lines.push(`- UI：${uiDir}/ui-cases-*.json ${ui ? `(命中 ${ui})` : "(未找到)"}`);
+  }
+  lines.push(
+    "",
+    "常见原因：",
+    "1. 在错误目录执行（应在包含 test-artifacts/ 的被测项目根目录运行）",
+    "2. 尚未生成用例（需先运行 api-test-case-generate / ui-test-case-generate）",
+    "3. --type 与现有产物不匹配（例如只有 API 用例却用了 --type ui）",
+    "4. test-artifacts/latest 指向的时间戳文件不存在",
+    "",
+    "解决方式：",
+    "  node scripts/validate-artifacts.mjs --type api",
+    "  node scripts/validate-artifacts.mjs --file test-artifacts/api-cases/api-cases-xxx.json",
+    "  node scripts/validate-artifacts.mjs --artifacts-dir <产物目录>",
+  );
+  return lines.join("\n");
+}
+
 function pushErr(list, file, moduleName, caseId, fieldPath, message) {
   list.push(`[${path.basename(file)}][${moduleName || "unknown"}][${caseId || "unknown"}][${fieldPath}] ${message}`);
 }
@@ -171,7 +206,7 @@ function main() {
   }
 
   if (files.length === 0) {
-    console.error("❌ 未找到可校验的用例文件。请检查 test-artifacts 或传入 --file。");
+    console.error(describeMissingFiles(opts, root));
     process.exit(1);
   }
 
