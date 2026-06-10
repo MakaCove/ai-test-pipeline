@@ -4,50 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b1a3b2d-feca-4677-97d3-258407edfff3" name="Changes" comment="feat(test): 增强UI测试脚本的元素定位和交互功能&#10;&#10;- 添加对radio角色元素的支持，扩展了getByRole搜索范围&#10;- 实现Element Plus单选按钮组的精确定位和点击策略&#10;- 新增可见对话框检测和定位功能，支持自动识别当前显示的对话框&#10;- 优化Element Plus el-select组件的选择逻辑，通过点击wrapper避免placeholder遮挡&#10;- 添加专门的el-select根节点查找函数，使用XPath精确匹配组件结构&#10;- 改进clickLocator函数，增强对各种Element Plus组件的点击处理&#10;- 重构select操作逻辑，区分普通select和el-select组件的不同处理方式&#10;- 更新select_dropdown操作使用新的el-select专用选择方法">
-      <change afterPath="$PROJECT_DIR$/ui-test-case-generate/02_主流程识别与编排.md" afterDir="false" />
+    <list default="true" id="0b1a3b2d-feca-4677-97d3-258407edfff3" name="Changes" comment="refactor(workflow): 调整测试工作流目录结构和执行路径&#10;&#10;- 将输出目录从 test-artifacts/ 调整为 ai-tests/test-artifacts/&#10;- 更新脚本执行路径为 node ai-tests/scripts/ 下的验证和执行脚本&#10;- 在执行前添加步骤0确保 ai-tests/ 目录下的脚本就绪&#10;- 项目分析器增加导航树结构提取和逐页DOM拆解功能&#10;- UI用例生成器重构为三个主要步骤：输入处理、范围圈定、用例生成&#10;- 更新共享目录中的产物目录布局为 ai-tests/&#10;- 重命名API编排文档并新增UI编排文档&#10;- 调整用例生成后校验确认的交互选项">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api-test-case-generate/01_工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/01_工作流.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/02_主流程识别与设计.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/03_智能编排.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/02_主流程识别与编排.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/04_验收与输出.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/05_完整示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/03_完整示例.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-case-generate/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-execute/01_工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-execute/01_工作流.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-execute/02_结果判定与示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-execute/02_结果判定与示例.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-test-execute/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-execute/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/01_工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/01_工作流.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/02_输出规范.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/02_输出规范.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/04_下游衔接.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/04_下游衔接.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/05_完整示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/05_完整示例.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-analyzer/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/project-analyzer/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-test-case-generate/03_完整示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/api-test-case-generate/03_完整示例.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/run-api-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run-api-tests.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/run-ui-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run-ui-tests.mjs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/validate-artifacts.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/validate-artifacts.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/01_目录.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/01_目录.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/03_项目分析结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/03_项目分析结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/04_接口用例结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/04_接口用例结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/05_UI用例结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/05_UI用例结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/06_断言语法.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/06_断言语法.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/07_选择器策略.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/07_选择器策略.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/08_产物目录布局.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/08_产物目录布局.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/09_ui-test-profile模板.md" beforeDir="false" afterPath="$PROJECT_DIR$/shared/09_ui-test-profile模板.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/10_接口报告模板.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/11_UI报告模板.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-case-generate/01_工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-case-generate/01_工作流.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-case-generate/02_主流程识别与设计.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-case-generate/03_菜单导航与步骤.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-case-generate/03_菜单导航与步骤.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-case-generate/04_智能编排.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-case-generate/05_验收与输出.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-case-generate/06_完整示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-case-generate/04_完整示例.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-case-generate/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-case-generate/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/01_工作流.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/01_工作流.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/02_浏览器配置.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/02_浏览器配置.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/03_结果判定与示例.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/03_结果判定与示例.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-test-execute/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/ui-test-execute/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/架构与流程.md" beforeDir="false" afterPath="$PROJECT_DIR$/架构与流程.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -199,7 +161,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780284245999</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="refactor(workflow): 调整测试工作流目录结构和执行路径&#10;&#10;- 将输出目录从 test-artifacts/ 调整为 ai-tests/test-artifacts/&#10;- 更新脚本执行路径为 node ai-tests/scripts/ 下的验证和执行脚本&#10;- 在执行前添加步骤0确保 ai-tests/ 目录下的脚本就绪&#10;- 项目分析器增加导航树结构提取和逐页DOM拆解功能&#10;- UI用例生成器重构为三个主要步骤：输入处理、范围圈定、用例生成&#10;- 更新共享目录中的产物目录布局为 ai-tests/&#10;- 重命名API编排文档并新增UI编排文档&#10;- 调整用例生成后校验确认的交互选项">
+      <option name="closed" value="true" />
+      <created>1781065669037</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1781065669037</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -226,6 +196,7 @@
     <MESSAGE value="docs: 更新文档结构与版本规范&#10;&#10;- 重命名 functional-test-case-generate 为 ui-test-case-generate&#10;- 更新所有文档中的 schema 版本从 v1 到 v2&#10;- 修改 package.json 中的 test:ui 脚本名称&#10;- 更新 README.md 为简化版本&#10;- 添加共享规范目录结构文档&#10;- 更新术语约定与选择器策略文档&#10;- 修正项目分析结构中的字段名称&#10;- 更新 API 和 UI 用例结构文档&#10;- 添加产物目录布局与浏览器配置文档&#10;- 更新报告模板文档中的字段引用&#10;- 修正断言语法文档中的测试类型引用" />
     <MESSAGE value="docs(guide): 更新测试用例生成流程文档并添加校验确认机制&#10;&#10;- 修改 API 和 UI 测试用例生成工作流，添加生成后校验确认步骤&#10;- 更新验收标准文档，明确用户选择校验时验证脚本应通过的要求&#10;- 在 README 中添加详细的使用步骤说明，包括项目分析、用例生成、校验和执行流程&#10;- 添加生成后交互说明，要求 Agent 询问用户是否执行校验而不是自动执行&#10;- 更新 SKILL 文档，添加生成后校验确认的相关说明&#10;- 修改 IDE 配置文件以反映最新的提交历史和任务记录" />
     <MESSAGE value="docs(testing): 更新测试文档以支持动态测试地址和增强报告功能&#10;&#10;- 移除硬编码的默认测试地址，改为从用例 meta.baseUrl 或 --base-url 参数获取&#10;- 添加对测试地址来源优先级的支持 (--base-url &gt; 用例 meta.baseUrl)&#10;- 实现在 API 报告中包含完整的请求参数(method/url/headers/body)和响应信息(status/headers/body)&#10;- 更新 UI 报告以在用例明细后直接嵌入相关截图，并改进截图处理逻辑&#10;- 增强 UI 执行器的定位策略，添加对 dialog 和特定组件类型的定位支持&#10;- 实现浏览器配置的默认有头模式和窗口最大化功能&#10;- 更新执行约定以明确在被测项目根目录执行脚本的要求&#10;- 改进错误处理和参数验证，确保测试地址缺失时给出清晰提示" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(testing): 更新测试文档以支持动态测试地址和增强报告功能&#10;&#10;- 移除硬编码的默认测试地址，改为从用例 meta.baseUrl 或 --base-url 参数获取&#10;- 添加对测试地址来源优先级的支持 (--base-url &gt; 用例 meta.baseUrl)&#10;- 实现在 API 报告中包含完整的请求参数(method/url/headers/body)和响应信息(status/headers/body)&#10;- 更新 UI 报告以在用例明细后直接嵌入相关截图，并改进截图处理逻辑&#10;- 增强 UI 执行器的定位策略，添加对 dialog 和特定组件类型的定位支持&#10;- 实现浏览器配置的默认有头模式和窗口最大化功能&#10;- 更新执行约定以明确在被测项目根目录执行脚本的要求&#10;- 改进错误处理和参数验证，确保测试地址缺失时给出清晰提示" />
+    <MESSAGE value="refactor(workflow): 调整测试工作流目录结构和执行路径&#10;&#10;- 将输出目录从 test-artifacts/ 调整为 ai-tests/test-artifacts/&#10;- 更新脚本执行路径为 node ai-tests/scripts/ 下的验证和执行脚本&#10;- 在执行前添加步骤0确保 ai-tests/ 目录下的脚本就绪&#10;- 项目分析器增加导航树结构提取和逐页DOM拆解功能&#10;- UI用例生成器重构为三个主要步骤：输入处理、范围圈定、用例生成&#10;- 更新共享目录中的产物目录布局为 ai-tests/&#10;- 重命名API编排文档并新增UI编排文档&#10;- 调整用例生成后校验确认的交互选项" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(workflow): 调整测试工作流目录结构和执行路径&#10;&#10;- 将输出目录从 test-artifacts/ 调整为 ai-tests/test-artifacts/&#10;- 更新脚本执行路径为 node ai-tests/scripts/ 下的验证和执行脚本&#10;- 在执行前添加步骤0确保 ai-tests/ 目录下的脚本就绪&#10;- 项目分析器增加导航树结构提取和逐页DOM拆解功能&#10;- UI用例生成器重构为三个主要步骤：输入处理、范围圈定、用例生成&#10;- 更新共享目录中的产物目录布局为 ai-tests/&#10;- 重命名API编排文档并新增UI编排文档&#10;- 调整用例生成后校验确认的交互选项" />
   </component>
 </project>

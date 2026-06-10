@@ -253,6 +253,18 @@ function renderRequestResponseSection(request, response) {
   return md;
 }
 
+function renderAssertionsTable(result) {
+  if (!result.assertions || result.assertions.length === 0) return "";
+  let md = "**断言**\n\n";
+  md += "| 字段 | 操作符 | 期望 | 实际 | 结果 |\n|------|--------|------|------|------|\n";
+  for (const a of result.assertions) {
+    const passLabel = a.pass ? "通过" : "失败";
+    md += `| \`${a.field}\` | \`${a.operator}\` | \`${JSON.stringify(a.expected)}\` | \`${JSON.stringify(a.actual)}\` | ${passLabel} |\n`;
+  }
+  md += "\n";
+  return md;
+}
+
 function orderCases(cases) {
   const hasOrder = cases.every((c) => Number.isFinite(c.executionOrder));
   if (hasOrder) return [...cases].sort((a, b) => a.executionOrder - b.executionOrder);
@@ -444,6 +456,7 @@ function buildMarkdown(meta, results, caseFile, baseUrl, durationMs) {
       md += `- **优先级**：${item.priority}\n`;
       md += `- **追溯主流程**：${item.flowRefs.join(", ")}\n`;
       md += `- **错误信息**：${item.error || "无"}\n\n`;
+      md += renderAssertionsTable(item);
       md += renderRequestResponseSection(item.request, item.response);
       md += "---\n\n";
     }
@@ -456,6 +469,7 @@ function buildMarkdown(meta, results, caseFile, baseUrl, durationMs) {
   md += "\n## 用例请求与响应明细\n\n";
   for (const item of results) {
     md += `### ${icon(item.status)} ${item.id} — ${item.title}\n\n`;
+    md += renderAssertionsTable(item);
     md += renderRequestResponseSection(item.request, item.response);
     md += "---\n\n";
   }

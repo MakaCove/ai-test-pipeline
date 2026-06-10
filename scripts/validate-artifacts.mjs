@@ -169,7 +169,7 @@ const VALID_UI_ASSERTIONS = new Set([
 
 const VALID_SCOPES = new Set(["core", "related", "regression"]);
 
-const VALID_API_OPERATORS = new Set(["eq", "neq", "contains", "not_contains", "equals", "gt", "lt", "regex", "type", "exists"]);
+const VALID_API_OPERATORS = new Set(["eq", "neq", "contains", "not_contains", "gt", "lt", "regex", "type", "exists", "not_exists"]);
 
 function validateApiFile(file) {
   const payload = readJson(file);
