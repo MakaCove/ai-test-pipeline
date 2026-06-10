@@ -7,11 +7,6 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "scripts": {
-    "validate": "node scripts/validate-artifacts.mjs",
-    "test:api": "node scripts/run-api-tests.mjs",
-    "test:ui": "node scripts/run-ui-tests.mjs"
-  },
   "optionalDependencies": {
     "playwright": "^1.49.0"
   }

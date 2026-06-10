@@ -22,6 +22,6 @@ disable-model-invocation: true
 
 ## 输出
 
-- `test-artifacts/project-analysis-{ts}.json`
+- `ai-tests/test-artifacts/project-analysis-{ts}.json`
 - schema：`ai-test-pipeline/project-analysis/v2`
 - Canonical Schema：[shared/03_项目分析结构.md](../shared/03_项目分析结构.md)

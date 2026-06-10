@@ -1,5 +1,13 @@
 #!/usr/bin/env node
 /**
+ * =============================================================================
+ * 模板文件 — 部署到目标项目 ai-tests/scripts/ 时复制此副本
+ * =============================================================================
+ * 来源：ai-test-pipeline 技能包 scripts/validate-artifacts.mjs
+ * 角色：产物轻量校验器（Schema 检查 + V1 字段检测 + trace 完整性）
+ * 部署规则：由 ui-test-execute / api-test-execute 步骤 0 按需首次复制，已存在则跳过
+ * =============================================================================
+ *
  * validate-artifacts.mjs — 产物轻量校验器
  */
 
@@ -9,7 +17,7 @@ import path from "node:path";
 const V1_FIELDS = ["dependsOnCases", "consumes", "produces", "flowRef", "featureRefs", "featureRef", "contractRef", "scenarioRef"];
 
 function parseArgs(argv) {
-  const opts = { artifactsDir: "test-artifacts", type: "all", file: null };
+  const opts = { artifactsDir: "ai-tests/test-artifacts", type: "all", file: null };
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
     if (a === "-h" || a === "--help") opts.help = true;
@@ -21,10 +29,10 @@ function parseArgs(argv) {
 }
 
 const HELP = `用法:
-  node scripts/validate-artifacts.mjs [选项]
+  node ai-tests/scripts/validate-artifacts.mjs [选项]
 
 选项:
-  --artifacts-dir <dir>  产物根目录（默认 ./test-artifacts）
+  --artifacts-dir <dir>  产物根目录（默认 ./ai-tests/test-artifacts）
   --type <api|ui|all>    校验类型（默认 all）
   --file <path>          直接指定单个用例文件
   -h, --help             显示帮助
@@ -76,15 +84,15 @@ function describeMissingFiles(opts, root) {
   lines.push(
     "",
     "常见原因：",
-    "1. 在错误目录执行（应在包含 test-artifacts/ 的被测项目根目录运行）",
+    "1. 在错误目录执行（应在包含 ai-tests/test-artifacts/ 的被测项目根目录运行）",
     "2. 尚未生成用例（需先运行 api-test-case-generate / ui-test-case-generate）",
     "3. --type 与现有产物不匹配（例如只有 API 用例却用了 --type ui）",
-    "4. test-artifacts/latest 指向的时间戳文件不存在",
+    "4. ai-tests/test-artifacts/latest 指向的时间戳文件不存在",
     "",
     "解决方式：",
-    "  node scripts/validate-artifacts.mjs --type api",
-    "  node scripts/validate-artifacts.mjs --file test-artifacts/api-cases/api-cases-xxx.json",
-    "  node scripts/validate-artifacts.mjs --artifacts-dir <产物目录>",
+    "  node ai-tests/scripts/validate-artifacts.mjs --type api",
+    "  node ai-tests/scripts/validate-artifacts.mjs --file ai-tests/test-artifacts/api-cases/api-cases-xxx.json",
+    "  node ai-tests/scripts/validate-artifacts.mjs --artifacts-dir <产物目录>",
   );
   return lines.join("\n");
 }
@@ -144,9 +152,28 @@ function validateCommon(file, payload, schemaNeedle) {
   return { errors, meta, cases };
 }
 
+const VALID_UI_ACTIONS = new Set([
+  "reset_session", "open_login", "ensure_session", "reset_page", "dismiss_menu",
+  "click_menu", "switch_auth_tab", "switch_tab", "activate_tab", "navigate",
+  "click", "double_click", "right_click", "fill", "clear", "select", "select_dropdown",
+  "check", "uncheck", "upload_file", "hover", "wait", "wait_visible", "press_key", "scroll", "screenshot",
+]);
+
+const VALID_UI_ASSERTIONS = new Set([
+  "element_visible", "element_hidden", "element_disabled", "element_enabled",
+  "text_contains", "text_not_contains", "url_equals", "url_contains",
+  "count_gte", "count_gt", "count_eq", "count_lt", "count_lte",
+  "input_value_equals", "input_value_contains",
+  "dialog_visible", "dialog_hidden", "toast_contains", "toast_not_contains", "attribute_equals",
+]);
+
+const VALID_SCOPES = new Set(["core", "related", "regression"]);
+
+const VALID_API_OPERATORS = new Set(["eq", "neq", "contains", "not_contains", "equals", "gt", "lt", "regex", "type", "exists"]);
+
 function validateApiFile(file) {
   const payload = readJson(file);
-  const { errors, cases } = validateCommon(file, payload, "api-case/v2");
+  const { errors, meta, cases } = validateCommon(file, payload, "api-case/v2");
   const idSet = new Set(cases.map((c) => c.id));
   for (const c of cases) {
     if (!c.request || typeof c.request !== "object") {
@@ -158,6 +185,11 @@ function validateApiFile(file) {
     if (!Array.isArray(c.assertions) || c.assertions.length === 0) {
       pushErr(errors, file, c.module, c.id, "assertions", "必须是非空数组");
     }
+    for (const a of c.assertions || []) {
+      if (a.operator && !VALID_API_OPERATORS.has(a.operator)) {
+        pushErr(errors, file, c.module, c.id, `assertions.${a.field || a.operator}`, `不支持的 operator：${a.operator}`);
+      }
+    }
     for (const depId of c.trace?.dependsOn || []) {
       if (!idSet.has(depId)) pushErr(errors, file, c.module, c.id, "trace.dependsOn", `引用不存在：${depId}`);
     }
@@ -167,17 +199,37 @@ function validateApiFile(file) {
 
 function validateUiFile(file) {
   const payload = readJson(file);
-  const { errors, cases } = validateCommon(file, payload, "ui-case/v2");
+  const { errors, meta, cases } = validateCommon(file, payload, "ui-case/v2");
   const idSet = new Set(cases.map((c) => c.id));
+  const menuMap = meta?.coverage?.routeMenuMap || [];
   for (const c of cases) {
     if (!Array.isArray(c.steps) || c.steps.length === 0) {
       pushErr(errors, file, c.module, c.id, "steps", "必须是非空数组");
     }
+    for (const s of c.steps || []) {
+      if (s.action && !VALID_UI_ACTIONS.has(s.action)) {
+        pushErr(errors, file, c.module, c.id, `steps.${s.step}.action`, `不支持的 action：${s.action}`);
+      }
+    }
     if (!Array.isArray(c.assertions) || c.assertions.length === 0) {
       pushErr(errors, file, c.module, c.id, "assertions", "必须是非空数组");
     }
+    for (const a of c.assertions || []) {
+      if (a.type && !VALID_UI_ASSERTIONS.has(a.type)) {
+        pushErr(errors, file, c.module, c.id, `assertions.${a.type}`, `不支持的断言类型：${a.type}`);
+      }
+    }
+    if (c.scope && !VALID_SCOPES.has(c.scope)) {
+      pushErr(errors, file, c.module, c.id, "scope", `不支持的 scope：${c.scope}`);
+    }
     for (const depId of c.trace?.dependsOn || []) {
       if (!idSet.has(depId)) pushErr(errors, file, c.module, c.id, "trace.dependsOn", `引用不存在：${depId}`);
+    }
+  }
+  // routeMenuMap 结构校验
+  for (const entry of menuMap) {
+    if (entry.requiresAuth && !entry.menuLabel && entry.navigation?.type !== "direct") {
+      pushErr(errors, file, "meta", "meta", "coverage.routeMenuMap", `条目缺少 menuLabel：route=${entry.route}`);
     }
   }
   return errors;

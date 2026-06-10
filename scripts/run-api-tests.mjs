@@ -1,5 +1,13 @@
 #!/usr/bin/env node
 /**
+ * =============================================================================
+ * 模板文件 — 部署到目标项目 ai-tests/scripts/ 时复制此副本
+ * =============================================================================
+ * 来源：ai-test-pipeline 技能包 scripts/run-api-tests.mjs
+ * 角色：接口用例执行器（HTTP 请求 + 断言 + Markdown 报告）
+ * 部署规则：由 api-test-execute 步骤 0 按需首次复制，已存在则跳过
+ * =============================================================================
+ *
  * run-api-tests.mjs — 接口用例执行器（只接受 trace.* 字段）
  */
 
@@ -12,7 +20,7 @@ const V1_FIELDS = ["dependsOnCases", "consumes", "produces", "flowRef", "feature
 function parseArgs(argv) {
   const opts = {
     file: null,
-    artifactsDir: "test-artifacts",
+    artifactsDir: "ai-tests/test-artifacts",
     baseUrl: null,
     limit: null,
     all: false,
@@ -36,10 +44,10 @@ function parseArgs(argv) {
 }
 
 const HELP = `用法:
-  node scripts/run-api-tests.mjs [文件路径] [选项]
+  node ai-tests/scripts/run-api-tests.mjs [文件路径] [选项]
 
 选项:
-  --artifacts-dir <dir>  产物根目录（默认 ./test-artifacts）
+  --artifacts-dir <dir>  产物根目录（默认 ./ai-tests/test-artifacts）
   --base-url <url>       指定测试地址（覆盖用例 meta.baseUrl）
   --limit <n>            仅执行前 n 条（按 executionOrder）
   --all                  执行全部（默认）
